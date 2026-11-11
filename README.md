@@ -1,43 +1,23 @@
-<div align="center">
-
-  <!-- Inline SVG Logo for Materna (Consistency & Globe Concept) -->
-  <svg width="110" height="110" viewBox="0 0 120 120" fill="none" xmlns="http://w3.org">
-    <defs>
-      <linearGradient id="maternaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2563EB"/>
-        <stop offset="100%" stop-color="#7C3AED"/>
-      </linearGradient>
-    </defs>
-    <rect width="120" height="120" rx="28" fill="url(#maternaGrad)"/>
-    <!-- Globe Circle -->
-    <circle cx="60" cy="60" r="32" stroke="white" stroke-width="4" stroke-opacity="0.9"/>
-    <ellipse cx="60" cy="60" rx="14" ry="32" stroke="white" stroke-width="3" stroke-opacity="0.7"/>
-    <!-- Equal / Consistency Sign Accent -->
-    <rect x="42" y="51" width="36" height="6" rx="3" fill="#34D399"/>
-    <rect x="42" y="63" width="36" height="6" rx="3" fill="#34D399"/>
-  </svg>
-
-  <h1>Materna</h1>
+<div align="center"> 
+  <h1>Materna</h1>  
   <p>
-    <strong>Seamless i18n to read, understand, and learn in any native tongue.</strong>
-  </p>
-
-  <!-- Badges -->
+    <strong>Seamless i18n to read, understand, and learn in any native tongue.
+  </p>  
+   <!-- Badges -->  
   <p>
-    <a href="https://github.com">
-      <img src="https://shields.io" alt="GitHub Stars" />
+    <a href="https://github.com/shaonkabir8/materna">
+      <img src="https://img.shields.io/github/stars/shaonkabir8/materna?style=flat-square" alt="GitHub Stars" />
     </a>
-    <a href="https://github.com">
-      <img src="https://shields.io" alt="License" />
+    <a href="https://github.com/shaonkabir8/materna/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/shaonkabir8/materna?style=flat-square" alt="License" />
     </a>
-    <a href="https://npmjs.com">
-      <img src="https://shields.io" alt="npm Version" />
+    <a href="https://github.com/shaonkabir8/materna">
+      <img src="https://img.shields.io/github/commit-activity/m/shaonkabir8/materna?style=flat-square" alt="Commit Activity" />
     </a>
-    <a href="https://github.com">
-      <img src="https://shields.io" alt="PRs Welcome" />
+    <a href="https://github.com/shaonkabir8/materna/pulls">
+      <img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs Welcome" />
     </a>
-  </p>
-
+  </p>  
   <p>
     <a href="#-the-problem">The Problem</a> •
     <a href="#-features">Features</a> •
