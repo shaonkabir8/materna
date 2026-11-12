@@ -1,0 +1,26 @@
+{
+  "name": "materna",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Materna: behavioral locale parity probing for Node.js and PostgreSQL",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shaonkabir8/materna"
+  },
+  "homepage": "https://github.com/shaonkabir8/materna",
+  "bugs": {
+    "url": "https://github.com/shaonkabir8/materna/issues"
+  },
+  "scripts": {
+    "test": "node --test",
+    "probe:node": "node src/cli.js node",
+    "probe:postgres": "node src/cli.js postgres"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
+}
