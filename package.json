@@ -1,7 +1,7 @@
 {
   "name": "materna",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "Materna: behavioral locale parity probing for Node.js and PostgreSQL",
   "type": "module",
   "repository": {
