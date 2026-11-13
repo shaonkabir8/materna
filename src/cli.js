@@ -5,6 +5,7 @@
  *   materna node                     probe Node.js collation
  *   materna postgres                 probe PostgreSQL collation
  *   materna compare --left A --right B   compare two observation files
+ *   materna report --left A --right B    render that comparison as HTML
  *
  * Exit codes are a contract, see docs/README.md.
  *
@@ -55,6 +56,10 @@ Options for postgres only:
   --collation <name>    PostgreSQL collation to order by, e.g. en-US-x-icu, C, de_DE.
                         Resolved against pg_collation; an unknown name is an error.
 
+Options for report:
+  --out <path>          Write the HTML document to <path> (default: stdout)
+  --json                Print the comparison outcome JSON instead of HTML
+
 Environment:
   DATABASE_URL          PostgreSQL connection string
   PG_COLLATION          Default for --collation
@@ -71,6 +76,7 @@ const OPTIONS = Object.freeze({
   node: new Set(COMMON_OPTIONS),
   postgres: new Set([...COMMON_OPTIONS, 'collation']),
   compare: new Set(['left', 'right', 'json']),
+  report: new Set(['left', 'right', 'out', 'json']),
 });
 
 const BOOLEAN_OPTIONS = new Set(['json']);
@@ -152,6 +158,9 @@ export function validateFlags(flags, command) {
   }
   if (flags.collation !== undefined && flags.collation.length === 0) {
     throw new Error('--collation must not be empty');
+  }
+  if (flags.out !== undefined && flags.out.length === 0) {
+    throw new Error('--out must not be empty');
   }
 
   return flags;
@@ -270,9 +279,9 @@ async function main(argv) {
     return EXIT.PASS;
   }
 
-  // command === 'compare'
+  // command === 'compare' or 'report'
   if (!flags.left || !flags.right) {
-    process.stderr.write('compare requires --left <path> and --right <path>\n');
+    process.stderr.write(`${command} requires --left <path> and --right <path>\n`);
     return EXIT.ERROR;
   }
 
@@ -289,6 +298,27 @@ async function main(argv) {
   }
 
   const outcome = compareObservations(left, right);
+
+  if (command === 'report') {
+    if (flags.json) {
+      process.stdout.write(`${JSON.stringify(outcome, null, 2)}\n`);
+      return EXIT[outcome.status] ?? EXIT.ERROR;
+    }
+
+    // The renderer is the only presenter: it refuses an outcome that
+    // contradicts itself rather than drawing a confident page from it.
+    const { renderReport } = await import('./report.js');
+    const html = renderReport({ left, right, outcome });
+
+    if (flags.out === undefined) {
+      process.stdout.write(html);
+    } else {
+      const { writeFileSync } = await import('node:fs');
+      writeFileSync(flags.out, html, 'utf8');
+      process.stderr.write(`report written to ${flags.out} (${outcome.status})\n`);
+    }
+    return EXIT[outcome.status] ?? EXIT.ERROR;
+  }
 
   if (flags.json) {
     process.stdout.write(`${JSON.stringify(outcome, null, 2)}\n`);
