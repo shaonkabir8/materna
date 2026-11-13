@@ -119,6 +119,43 @@ if (outcome.status === 'DIFFERENCE') {
 Also exported: `loadCorpus`, `validateObservation`, `canonicalJson`,
 `resultHash`, `sha256Hex`, `firstDifference`, `STATUS`, `OBSERVATION_SCHEMA`.
 
+## Render the comparison as a report
+
+```bash
+node src/cli.js node     --json > node.json
+node src/cli.js postgres --json > pg.json
+node src/cli.js report   --left node.json --right pg.json --out report.html
+```
+
+The report is a **projection of the comparison outcome**, not a second opinion.
+Every value on the page is read from the comparison outcome or from the two
+observation documents; nothing is computed for display. Two invariants hold by
+construction and are asserted in tests:
+
+```
+report.status          === outcome.status
+report.corpus_verified === outcome.corpus_verified
+```
+
+An outcome that contradicts itself (a `PASS` carrying a `first_difference`, a
+`DIFFERENCE` with no difference, a decided verdict with no reproducible
+fingerprints) is **refused** rather than rendered.
+
+Rendering is deterministic: no clock, no randomness, no process id. Identical
+inputs produce byte-identical HTML, which is what makes the page reviewable and
+diffable. Quantities this project does not measure — elapsed time, heap, a run
+timestamp, a multi-locale matrix — are printed as **not measured** with the
+reason, because a plausible-looking placeholder number is indistinguishable from
+a real one.
+
+Observation documents are untrusted input. The generated page contains no
+JavaScript at all, and every value reaches only an escaped text node or an
+escaped double-quoted attribute, so a hostile sample, environment string or
+`reason` cannot break out of its context.
+
+`materna report` uses the same exit-code contract as `compare` (0 `PASS`,
+1 `DIFFERENCE`, 2 `INCONCLUSIVE`, 3 `ERROR`), so it can gate a pipeline directly.
+
 ## What the output means
 
 An observation records four things separately:

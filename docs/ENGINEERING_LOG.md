@@ -6,6 +6,215 @@ Replace the "next loop" section at the start of each loop.
 
 ---
 
+## Loop 002 — 2026-11-13 — the report becomes a projection, not a mock-up
+
+Base commit: `dcfc9589d70121a66b948a7a36b2fd989a34ac37` ("feat(core): implement the
+documented P0 probing foundation"), plus the loop 001 working tree that was
+supplied as `materna-loop-001-repo.zip` and had never been committed.
+
+### A. Repository state before this loop
+
+- Remote `main` was at `dcfc958`. The supplied snapshot contained **uncommitted**
+  loop 001 work: 671 insertions across `src/{observation,compare,cli,index}.js`,
+  `src/adapters/postgres.js`, `package.json`, `README.md`, `docs/README.md`, both
+  HTML pages, plus new `.github/workflows/ci.yml`, `docs/ENGINEERING_LOG.md` and
+  four new test files. `git status` on a fresh clone therefore showed 11 modified
+  and 6 untracked entries, not a clean tree. Loop 001's delivery existed only as
+  an archive, so nothing in it was reproducible from the repository itself.
+- Local baseline of that tree, with PostgreSQL 16.15 reachable: **80 tests, 80
+  pass, 0 fail, 0 skipped**. Node 22.23.4, npm 10.9.9, Linux x86_64, ICU 78.3,
+  Unicode 17.0.
+- There was no presentational layer at all. `compareObservations()` returned
+  `status`, `reason`, `corpus_verified`, `metadata`, `metadata_differences`,
+  `first_difference`, `missing`, `invalid`, `incompatible` — and the CLI printed
+  them to stdout and threw them away. Nothing could render an outcome.
+- `docs/report/index.html` (1543 lines) was a design shell carrying a hand-written
+  demo dataset: `Node 20.11 · PG 16.2`, `8` probes, `6 of 8` diverged, `1,842 ms`,
+  `8.7 MB` peak heap with `baseline 4.2`, `1.2 MB` external, `+0.6 MB` growth,
+  `ICU 74.2 on both`. It already carried an illustrative banner, so the page was
+  not *lying* — but its numbers were still formatted exactly like measurements,
+  and no file in the repository could produce any of them. `1,842 ms` and the heap
+  figures have no producer: `src/probe.js` records `process.versions.*` only.
+- `index.html` (3176 lines) had three corrupted status rows, each an unclosed
+  `<span>`: `BLOCKEDVERIFIED · PG 18.6`, `NOT IMPLEMENTEDIMPLEMENTED`,
+  `NOT ESTABLISHEDDEFINED · UNEXECUTED`. Two of those claims were also false at
+  HEAD: live PostgreSQL verification and the comparison CLI both worked.
+
+### B. Verified defects (reproduced before fixing)
+
+1. **Untraceable report.** Every figure in `docs/report/index.html` was
+   unproducible by this repository. Severity: medium (trust/evidence integrity,
+   not a runtime vulnerability). Reproduction: grep the literals; grep the source
+   tree for any timing or heap instrumentation — none exists.
+2. **No outcome → presentation path.** `materna compare` was the end of the line.
+   Severity: medium (capability gap). Reproduction: `src/cli.js` subcommands are
+   `node`, `postgres`, `compare` only.
+3. **Corrupted, unclosed markup in `index.html`.** Severity: low (rendering), but
+   the corrupted text carried two false status claims. Reproduction: the three
+   rows listed above; each `<span>` lacks `</span>` and the closing `</div>` is
+   inside the span's text.
+
+### C. Rejected assumptions
+
+- *"A generated report needs a templating engine."* Rejected: the whole document
+  is composed from a fixed set of sections whose values are escaped strings. A
+  dependency would add supply-chain surface for zero behavioural gain.
+- *"The demo page should be deleted, or replaced by the generated one."* Rejected:
+  the brief forbids removing either page, and the shell carries the visual
+  identity (design tokens, i18n dictionaries, RTL rules, theme persistence) that a
+  generated report should inherit rather than reinvent.
+- *"Timing and heap could be measured cheaply and kept."* Rejected for this loop:
+  adding instrumentation changes probe semantics and the observation schema, which
+  is out of scope. The honest move is to state that the quantity is not measured.
+- *"Rendering `JSON.stringify(observation)` into a `<script>` block is safe because
+  it is JSON."* Rejected: `</script>` inside a string value terminates the script
+  element; JSON is not HTML-safe. The generated document therefore contains **no
+  script element at all**, and raw JSON is inlined into an escaped `<pre>`.
+
+### D. Engineering decisions
+
+- **New module `src/report.js`** (no new dependency, no template language). It
+  exports `renderReport`, `buildReportModel`, `assertOutcomeConsistency` and
+  `escapeHtml`. It is re-exported from `src/index.js` so a consumer can render the
+  same bytes the CLI writes.
+- **The outcome is the only source of truth.** `buildReportModel()` copies
+  `status` and `corpus_verified` from the outcome and then re-asserts
+  `model.status === outcome.status` and
+  `model.corpus_verified === (outcome.corpus_verified === true)` before returning.
+  `assertOutcomeConsistency()` rejects an outcome that contradicts itself, so the
+  page fails closed instead of rendering a confident fiction.
+- **Refusal cases** (all tested): unknown `status`; `PASS` carrying a
+  `first_difference`; `DIFFERENCE` with no `first_difference`; empty `reason`;
+  decided outcome with no `corpus_verified` boolean; decided outcome with
+  non-hex `left_hash`/`right_hash`; missing `metadata`; non-object outcomes.
+- **Unmeasured quantities are named.** A "Not measured by this run" section lists
+  elapsed time, peak heap, run timestamp, locale matrix and PII redaction with the
+  reason each is absent. A blank or plausible placeholder reads as a measurement;
+  an explicit "not measured — the probes record no timings" cannot.
+- **Determinism by construction.** No `Date`, no `Math.random`, no `process.pid`,
+  no locale-dependent formatting, keys iterated in sorted order. Verified by
+  rendering in two child processes under different `TZ` and `LANG` and comparing
+  hex bytes, not by inspection.
+- **No JavaScript in the output.** With no script context, untrusted observation
+  values can only reach an escaped text node or an escaped double-quoted
+  attribute. This removes an entire class of bug rather than guarding one context.
+- **Bounded inlining.** Orderings are inlined to 48 rows per side and raw JSON to
+  12,000 characters per side, with a statement of what was omitted and a reminder
+  that the fingerprint still covers the whole result. An observation that fails
+  corpus verification can carry an arbitrarily long ordering, so the bound is a
+  availability control, not cosmetics.
+- **Exit codes reused, not reinvented.** `materna report` returns the same mapping
+  as `compare` (0/1/2/3), so it can gate a pipeline. A caller that ignores the
+  exit code still gets a file; a caller that honours it gets the verdict.
+
+### E. Implemented changes
+
+| File | Why |
+|:---|:---|
+| `src/report.js` (new, 660 lines) | The renderer: escaping, model construction, consistency refusal, ten fixed sections, embedded CSS |
+| `src/cli.js` | `report` subcommand with `--out` and `--json`, per-subcommand option validation, shared `--left/--right` handling |
+| `src/index.js` | Re-export the renderer for programmatic use |
+| `test/report.test.js` (new, 18 tests) | Correctness for all four statuses, the invariant, refusal cases, determinism across processes, non-mutation, escaping, CLI contract |
+| `docs/report/index.html` | Banner names the real command; every invented figure replaced with "not measured" or relabelled as demo data; header comment states what the file is and is not |
+| `index.html` | Three mangled status rows repaired (`VERIFIED · LOCAL PG 16`, `IMPLEMENTED`, `DEFINED · UNEXECUTED`), unclosed spans closed, report row added |
+| `README.md`, `docs/README.md` | Document `materna report`, the two invariants, determinism and the escaping model |
+| `.github/workflows/ci.yml` | New step renders a report from a real comparison and asserts exit-code parity, status parity, byte-identical re-render, and absence of placeholder metrics |
+
+### F. Test and CI evidence
+
+- Full suite, PostgreSQL 16.15 reachable, Node 22.23.4: **98 tests, 98 pass,
+  0 fail, 0 skipped** (`node --test`).
+- `test/report.test.js` alone: **18 tests, 18 pass, 0 fail, 0 skipped**.
+- Live PostgreSQL suites (`postgres-live`, `postgres-collation-live`) alone:
+  **11 tests, 11 pass, 0 fail, 0 skipped** — the adapter tests genuinely executed,
+  they did not skip.
+- Evidence level for the above: **E3** (automated behavioural verification, one
+  environment). Not E4: a single Node and a single PostgreSQL version.
+- Two of my own new assertions failed on first run and were **wrong, not the
+  code**: one matched the CSS class `badge-difference` in the stylesheet of a PASS
+  page, the other expected a benign non-BMP string to be removed rather than
+  escaped. Both assertions were corrected; the renderer was not changed. Recorded
+  because "the test was wrong" is the most common way a green suite becomes a lie.
+- Hosted CI: recorded honestly in the pull request. A workflow file existing is
+  E1; only an executed run on a hosted runner is hosted-execution evidence.
+
+### G. Security findings
+
+| Finding | Severity | Status |
+|:---|:---|:---|
+| Observation documents are untrusted input rendered into HTML (stored-XSS surface) | high if unmitigated | **Mitigated**: no script element in output; every value passes `escapeHtml` into a text node or double-quoted attribute; `&`, `<`, `>`, `"`, `'`, U+2028, U+2029 escaped. Tested with 7 hostile and 4 benign payloads. |
+| `</style>` breakout via a sample or environment value | high if unmitigated | **Mitigated**: values never reach the `<style>` block; `</` is escaped wherever it does appear. |
+| JSON-in-`<script>` would be terminated by `</script>` inside a string | high if adopted | **Avoided by design**: no script element exists. |
+| Forged fingerprint presented as proof of a real run | medium (epistemic) | **Mitigated by wording and structure**: `corpus_verified` is a separate badge; the page states "Integrity is not authenticity" beside the verdict. Integrity is still not authenticity — see §H. |
+| Renderer as a DoS amplifier on an arbitrarily long non-verifying ordering | low | **Mitigated**: 48 rows / 12,000 chars per side, with the omission stated. |
+| Secret leakage into the page | low | **Mitigated by scope**: only the `environment` block is echoed, and observations contain no connection strings; `src/adapters/postgres.js` records server metadata, never the DSN. No new logging was added. |
+| CI privilege | — | Unchanged: `permissions: contents: read`, no `pull_request_target`, no secrets consumed by PR code. The new step only reads and writes workspace files. |
+| Comparative diff injection into the page | high if unmitigated | **Mitigated**: `field`, `left`, `right` from `metadata_differences` and `incompatible` are escaped, and non-strings are serialised before escaping. |
+
+### H. Remaining uncertainties
+
+- **An attacker who recomputes `result_hash` over a correctly reordered corpus
+  still produces a document that compares.** Corpus conformance constrains the
+  multiset, not the ordering's provenance, and there is no signature. A generated
+  report cannot do better than the comparison it projects. Unsigned observations
+  remain the deepest limitation of the project.
+- The rendered page was verified by asserting on its bytes and by reading the
+  produced file; it was **not** opened in a real browser engine. No layout,
+  contrast or print behaviour was verified, and the demo shell's own client-side
+  JS was only inspected statically.
+- Hosted CI matrix (Node 20 × PostgreSQL 14) has not been observed for this commit
+  in this environment; local evidence is Node 22 × PostgreSQL 16 only.
+- The report renders one comparison. It does not aggregate a matrix, and nothing
+  in it should be read as a claim about locale coverage.
+
+### I. Deferred work
+
+- A multi-locale matrix runner (the `6 of 8` figure is the shape of that missing
+  feature; it stayed unmade deliberately).
+- Optional measurement of elapsed time and heap, if and when a probe records them
+  at all — with a schema version bump.
+- Signed observations, or a provenance field bound to a CI run identity.
+- Porting the generated page's sections into the demo shell's tab layout, so the
+  shell becomes the renderer's stylesheet rather than a parallel artefact.
+
+### J. Next-loop recommendation
+
+NEXT_LOOP:
+  priority: high
+  problem: A valid `result_hash` proves a document is unedited, not that the run it
+    describes happened. `corpusConformance()` constrains the multiset and the
+    ordering is checked for rearrangement, but an attacker can recompute a
+    consistent hash over a plausible ordering and still compare PASS.
+  evidence: README "Limitations" already states this; loop 001 §B produced a
+    self-consistent false observation that compared PASS before corpus checks
+    existed, and the check added since narrows but does not close the gap. The
+    report now surfaces it as a permanent caveat rather than a fix.
+  impact: The project's central claim is behavioural evidence. Unauthenticated
+    evidence caps how far it can be trusted.
+  confidence: high
+  complexity: medium — a detached signature or a CI-issued attestation over the
+    canonical observation, verified optionally, without breaking documents that
+    carry none.
+  security_risk: medium — key handling, and a signature check that silently passes
+    when absent would be worse than none.
+  smallest_solution: an optional `attestation` block holding a detached Ed25519
+    signature over `canonicalJson({probe, corpus, environment, result})`, plus
+    `verifyObservation(observation, publicKey)` returning
+    verified|absent|invalid, and one report badge that distinguishes "integrity
+    verified" from "provenance verified".
+  acceptance_criteria: absent attestation stays INCONCLUSIVE-neutral and is labelled
+    absent, never "verified"; a tampered result invalidates the signature; an
+    invalid signature cannot compare PASS; the report distinguishes the three
+    states; no new runtime dependency.
+  verification_method: unit tests over signed/tampered/absent documents, a CLI
+    round-trip, and a report assertion that the badge text tracks the verification
+    result.
+  unresolved_questions: where the private key lives in CI; whether the public key
+    is published in-repo; whether key rotation is in scope.
+  evidence_level: E3 for the current checks; E0 for the proposed design.
+
+---
+
 ## Loop 001 — 2026-11-13 — observation integrity + real collation selection
 
 Base commit: `dcfc9589d70121a66b948a7a36b2fd989a34ac37`
