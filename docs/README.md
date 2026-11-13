@@ -111,7 +111,7 @@ The existing adapter:
 
 Verification status for live PostgreSQL
 
-Live PostgreSQL execution has been established against PostgreSQL 16.15 on Linux (x86_64) through this adapter.
+Live PostgreSQL execution has been re-established against PostgreSQL 18.6 on Linux (x86_64) through this adapter in this revision.
 
 Observed evidence from that run:
 
@@ -124,13 +124,22 @@ Boundary: this is one server version on one operating system. Other PostgreSQL v
 
 3. Test a Named PostgreSQL Collation
 
-Set an existing PostgreSQL collation:
+Name an existing PostgreSQL collation on the command line:
 
-export PG_COLLATION='some_collation'
+node src/cli.js postgres --collation en-US-x-icu
 
-Run:
+or via the environment variable:
 
+export PG_COLLATION='en-US-x-icu'
 npm run probe:postgres
+
+The name is resolved against `pg_collation` with a parameterized query, and the
+identifier interpolated into `ORDER BY` is built from the catalog row. Anchor on
+the catalog, not on a string pattern: ICU names (`en-US-x-icu`) contain dashes,
+and some libc names (`C.utf8`, `en_US.utf8`) contain a dot that looks exactly
+like a schema qualifier. The whole name is therefore tried before any
+`schema.name` split, and an unknown name is an error rather than a silent
+fallback to the database default.
 
 Windows PowerShell:
 
@@ -269,7 +278,10 @@ Metadata-only false-positive resistance| PASS — source test
 Missing evidence handling| PASS — source test
 Node.js probe| IMPLEMENTED
 PostgreSQL adapter implementation| IMPLEMENTED
-PostgreSQL live execution| VERIFIED — PostgreSQL 16.15, Linux x86_64 (single environment)
+PostgreSQL live execution| VERIFIED — PostgreSQL 18.6, Linux x86_64 (single environment, E3)
+Collation selection (`--collation`)| IMPLEMENTED — catalog-resolved; live tests on 18.6
+Observation corpus conformance| IMPLEMENTED — ordering must be a rearrangement of the named corpus
+CONTINUOUS INTEGRATION| DEFINED — workflow committed, not yet executed on hosted runners (E1)
 Compare CLI execution| IMPLEMENTED — exit-code contract documented
 Hash-integrity rejection| IMPLEMENTED — recomputed, not trusted
 Programmatic comparison API| IMPLEMENTED
@@ -280,9 +292,11 @@ The source-level test results describe the supplied test implementation. They ar
 
 9. Project Identity
 
-Materna's canonical product identity and naming conventions are documented in:
-
-""BRAND.md"" (./BRAND.md)
+Materna's canonical technical identifiers are defined by the code, not by a
+separate brand document: the package name in `package.json`, the probe id
+`collation.sort` in `src/probe.js`, the corpus id `collation-core-v1` in
+`src/corpus/`, and the CLI surface in `src/cli.js`. Engineering history and
+evidence levels are recorded in `docs/ENGINEERING_LOG.md`.
 
 The existing technical identifier remains:
 

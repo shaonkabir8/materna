@@ -3,10 +3,15 @@ import { test } from 'node:test';
 
 import { postgresEnvironment, quoteCollation } from '../src/adapters/postgres.js';
 
-test('quoteCollation accepts plain and schema-qualified identifiers', () => {
+test('quoteCollation quotes a single identifier and accepts real collation names', () => {
   assert.equal(quoteCollation('de_DE'), '"de_DE"');
-  assert.equal(quoteCollation('pg_catalog."C"'.replace(/"/g, '')), '"pg_catalog"."C"');
   assert.equal(quoteCollation('en_US$1'), '"en_US$1"');
+  // Real ICU names, which the quote-only rule used to reject outright.
+  assert.equal(quoteCollation('en-US-x-icu'), '"en-US-x-icu"');
+  // A dotted name is one identifier. Schema qualification is resolved against
+  // pg_collation by resolveCollation(), not guessed from the string: see
+  // test/collation-identifier.test.js for why splitting on the dot is unsound.
+  assert.equal(quoteCollation('pg_catalog.C'), '"pg_catalog.C"');
 });
 
 test('quoteCollation rejects injection attempts', () => {

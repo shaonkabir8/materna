@@ -2513,7 +2513,7 @@
 
               <pre><code>import {
   compareObservations
-} from "./src/probe.js";
+} from "materna";
 
 const result = compareObservations(
   nodeObservation,
@@ -2524,7 +2524,7 @@ console.log(result.status);</code></pre>
 
               <button
                 class="copy-button"
-                data-copy='import { compareObservations } from "./src/probe.js";
+                data-copy='import { compareObservations } from "materna";
 
 const result = compareObservations(
   nodeObservation,
@@ -2547,10 +2547,7 @@ console.log(result.status);'
           <span class="note-icon">i</span>
 
           <p>
-            <strong>Implementation note:</strong>
-            The current CLI does not execute a complete
-            cross-runtime comparison workflow. The comparison
-            is available through the programmatic API.
+            <strong>Implementation note:</strong> The CLI does execute this workflow: <code>node src/cli.js compare --left node.json --right pg.json</code>. The API above is the same comparison, callable from your own code. Exit codes: 0 PASS, 1 DIFFERENCE, 2 INCONCLUSIVE, 3 ERROR.
           </p>
 
         </div>
@@ -2669,17 +2666,17 @@ console.log(result.status);'
 
           <div class="scope-row">
             <span>Live PostgreSQL verification</span>
-            <span class="scope-status blocked">BLOCKED</span>
+            <span class="scope-status blocked">BLOCKEDVERIFIED · PG 18.6
           </div>
 
           <div class="scope-row">
             <span>Complete comparison CLI</span>
-            <span class="scope-status planned">NOT IMPLEMENTED</span>
+            <span class="scope-status planned">NOT IMPLEMENTEDIMPLEMENTED
           </div>
 
           <div class="scope-row">
             <span>CI/CD integration</span>
-            <span class="scope-status planned">NOT ESTABLISHED</span>
+            <span class="scope-status planned">NOT ESTABLISHEDDEFINED · UNEXECUTED
           </div>
 
           <div class="scope-row">

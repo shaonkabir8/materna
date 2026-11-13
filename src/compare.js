@@ -3,13 +3,17 @@
  *
  * Comparison is intentionally conservative:
  *   - missing evidence is INCONCLUSIVE, never PASS;
+ *   - an observation that is not a rearrangement of the corpus it names is
+ *     INCONCLUSIVE, because its fingerprint is a fingerprint of the wrong
+ *     experiment;
  *   - observations that declare different probes, options or corpora are
  *     INCONCLUSIVE, because their fingerprints are not comparable;
  *   - a metadata difference alone is not a behavioural failure;
  *   - unexpected failures are ERROR, never a silent success.
  */
 
-import { canonicalJson, validateObservation } from './observation.js';
+import { canonicalJson, corpusConformance, validateObservation } from './observation.js';
+import { loadCorpus } from './corpus.js';
 
 export const STATUS = Object.freeze({
   PASS: 'PASS',
@@ -62,6 +66,35 @@ function environmentDifferences(left, right) {
   return differences;
 }
 
+/**
+ * Check an observation against the corpus it names, when that corpus is
+ * available locally.
+ *
+ * A fingerprint only means something relative to the inputs it was computed
+ * over. An observation that declares `collation-core-v1@1` but ordered two
+ * samples of it is self-consistent and worthless: the hash proves the document
+ * was not edited, not that the experiment declared by the document happened.
+ */
+function corpusCheck(observation) {
+  const declaredId = observation?.corpus?.id;
+  if (typeof declaredId !== 'string' || declaredId.length === 0) {
+    return { verified: false, problems: [], unverified: 'observation declares no corpus id' };
+  }
+
+  let corpus;
+  try {
+    corpus = loadCorpus(declaredId);
+  } catch (error) {
+    return {
+      verified: false,
+      problems: [],
+      unverified: `corpus ${JSON.stringify(declaredId)} is not available locally (${error && error.message ? error.message.split('\n')[0] : String(error)})`,
+    };
+  }
+
+  return { verified: true, problems: corpusConformance(observation, corpus), unverified: null };
+}
+
 export function firstDifference(leftResult, rightResult) {
   const leftOrder = leftResult.order ?? [];
   const rightOrder = rightResult.order ?? [];
@@ -99,7 +132,16 @@ export function firstDifference(leftResult, rightResult) {
   return null;
 }
 
-export function compareObservations(left, right) {
+/**
+ * Compare two observations.
+ *
+ * `requireCorpusVerification` (default `false`) turns an observation whose
+ * declared corpus cannot be resolved locally into INCONCLUSIVE instead of
+ * merely flagging it. Callers comparing evidence from outside this repository
+ * should set it: without it, `corpus_verified: false` is the only signal that
+ * the ordering was never checked against the corpus it names.
+ */
+export function compareObservations(left, right, { requireCorpusVerification = false } = {}) {
   try {
     const leftValidation = validateObservation(left);
     const rightValidation = validateObservation(right);
@@ -113,8 +155,35 @@ export function compareObservations(left, right) {
         status: STATUS.INCONCLUSIVE,
         reason: tampered
           ? 'observation is not self-consistent: declared fingerprint does not match observed result'
-          : 'required observed evidence is missing',
+          : 'required observed evidence is missing or malformed',
         missing: { left: leftValidation.missing, right: rightValidation.missing },
+      };
+    }
+
+    const leftCorpus = corpusCheck(left);
+    const rightCorpus = corpusCheck(right);
+    const corpusVerified = leftCorpus.verified && rightCorpus.verified;
+
+    if (leftCorpus.problems.length > 0 || rightCorpus.problems.length > 0) {
+      return {
+        status: STATUS.INCONCLUSIVE,
+        reason: 'observation is not what it declares: its ordering does not match the corpus it names',
+        invalid: { left: leftCorpus.problems, right: rightCorpus.problems },
+        corpus_verified: corpusVerified,
+        metadata: comparisonMetadata(left, right),
+      };
+    }
+
+    if (requireCorpusVerification && !corpusVerified) {
+      return {
+        status: STATUS.INCONCLUSIVE,
+        reason: 'corpus verification was required but the declared corpus could not be resolved locally',
+        unverified: {
+          left: leftCorpus.unverified,
+          right: rightCorpus.unverified,
+        },
+        corpus_verified: false,
+        metadata: comparisonMetadata(left, right),
       };
     }
 
@@ -133,6 +202,7 @@ export function compareObservations(left, right) {
         status: STATUS.INCONCLUSIVE,
         reason: 'observations are not comparable: declarations differ',
         incompatible,
+        corpus_verified: corpusVerified,
         metadata: comparisonMetadata(left, right),
       };
     }
@@ -145,6 +215,7 @@ export function compareObservations(left, right) {
         status: STATUS.PASS,
         reason: 'result fingerprints match',
         metadata,
+        corpus_verified: corpusVerified,
         metadata_differences: metadataDifferences,
         first_difference: null,
       };
@@ -154,6 +225,7 @@ export function compareObservations(left, right) {
       status: STATUS.DIFFERENCE,
       reason: 'result fingerprints differ',
       metadata,
+      corpus_verified: corpusVerified,
       metadata_differences: metadataDifferences,
       first_difference: firstDifference(left.result, right.result),
     };
