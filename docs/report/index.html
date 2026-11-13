@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <!--
-  MATERNA — HTML REPORT SHELL DEMO
-  ─────────────────────────────────
+  MATERNA — HTML REPORT SHELL (design demo)
+  ──────────────────────────────────────────
   Source: docs/report/index.html
-  Status: Design demo · illustrative data only
-  Not:    A live report generator. Probe values below are
-          hardcoded examples, not a verified Materna run.
-  Wiring: Real data injection is tracked separately.
+  Status: Design shell · every figure is placeholder demo data
+  Not:    A generated report. Real reports are produced by
+          `materna report --left A --right B --out report.html`,
+          which renders only values read from the two observations
+          and from the comparison outcome.
+  Why:    The shell is kept because its layout, i18n and theming are
+          the visual identity a generated report should inherit.
+          The demo dataset below is not, and must never be cited.
 -->
 <html lang="en" dir="ltr" data-theme="light">
 <head>
@@ -508,10 +512,10 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid
     <div class="eyebrow"><span class="eyebrow-dot"></span><span data-i18n="overview.eyebrow">Behavioral Report (illustrative)</span></div>
     <h1 class="h1">Node.js <span class="h1-accent">×</span> PostgreSQL</h1>
     <div class="meta-row">
-      <div class="meta-item"><span class="meta-label" data-i18n="overview.run_at">Run at</span><span class="meta-value" translate="no">2026-11-13 · 14:42 UTC</span></div>
-      <div class="meta-item"><span class="meta-label" data-i18n="overview.environment">Environment</span><span class="meta-value" translate="no">Node 20.11 · PG 16.2</span></div>
+      <div class="meta-item"><span class="meta-label" data-i18n="overview.run_at">Run at</span><span class="meta-value" translate="no">no run recorded</span></div>
+      <div class="meta-item"><span class="meta-label" data-i18n="overview.environment">Environment</span><span class="meta-value" translate="no">demo dataset (not measured)</span></div>
       <div class="meta-item"><span class="meta-label" data-i18n="overview.format">Format</span><span class="meta-value" translate="no">HTML · v2</span></div>
-      <div class="meta-item"><span class="meta-label" data-i18n="overview.probes">Probes</span><span class="meta-value" translate="no">8</span></div>
+      <div class="meta-item"><span class="meta-label" data-i18n="overview.probes">Probes</span><span class="meta-value" translate="no">8 demo probes</span></div>
     </div>
 
     <div class="summary-card" data-status="difference" role="status">
@@ -521,7 +525,7 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid
           <span data-i18n="status.difference">Difference</span>
         </span>
         <h2 class="summary-title" data-i18n="overview.summary_title">Behavioral divergence detected</h2>
-        <p class="summary-desc" data-i18n="overview.summary_desc">6 of 8 locale probes produced different orderings.</p>
+        <p class="summary-desc" data-i18n="overview.summary_desc">Demo data: 6 of 8 placeholder probes are drawn as diverged. Nothing on this page was observed.</p>
         <div class="summary-stats">
           <div class="stat" data-kind="diff"><span class="stat-value" id="statDiverged">6</span><span class="stat-label" data-i18n="overview.stat_diverged">Diverged</span></div>
           <div class="stat" data-kind="pass"><span class="stat-value" id="statPassed">1</span><span class="stat-label" data-i18n="overview.stat_passed">Passed</span></div>
@@ -539,10 +543,10 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid
     <div class="glance">
       <div class="glance-title" data-i18n="overview.glance">At a glance</div>
       <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_slowest">Slowest probe</span><span class="glance-val" id="glanceSlowest" translate="no">sv-SE · PG · 4.87ms · 2.3×</span></div>
-      <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_runtime">Total runtime</span><span class="glance-val" translate="no">1,842 ms</span></div>
-      <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_peak">Peak heap (Node)</span><span class="glance-val" id="glancePeak" translate="no">8.7 MB</span></div>
-      <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_pii">PII redactions</span><span class="glance-val" id="glancePii" translate="no">3 values · auto</span></div>
-      <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_notable">Notable</span><span class="glance-val" data-i18n="overview.glance_notable_val">ICU 74.2 on both — behaviors still differ</span></div>
+      <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_runtime">Total runtime</span><span class="glance-val" translate="no">not measured — Materna records no timings</span></div>
+      <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_peak">Peak heap (Node)</span><span class="glance-val" id="glancePeak" translate="no">not measured</span></div>
+      <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_pii">PII redactions</span><span class="glance-val" id="glancePii" translate="no">not performed — the corpus is fixed sample data</span></div>
+      <div class="glance-row"><span class="glance-key" data-i18n="overview.glance_notable">Notable</span><span class="glance-val" data-i18n="overview.glance_notable_val">Placeholder layout only — see the generated report for real values</span></div>
     </div>
 
     <div class="quick-actions">
@@ -617,7 +621,7 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid
 <section class="panel" data-panel="performance" role="tabpanel">
   <div class="container section-pad">
     <h2 class="h2" data-i18n="perf.title">Performance</h2>
-    <p class="lead" data-i18n="perf.desc">Wall-clock observation per probe. Real timing only — not a load test.</p>
+    <p class="lead" data-i18n="perf.desc">Placeholder timings from the demo dataset. Materna does not measure elapsed time, so a generated report states this section is not measured instead of drawing bars.</p>
 
     <!-- CHART 3: Timing Split -->
     <div class="chart-card">
@@ -630,12 +634,12 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid
     <div class="memory-block">
       <h3 class="memory-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg><span data-i18n="perf.memory_title">Memory footprint (Node.js)</span></h3>
       <div class="memory-rows">
-        <div class="memory-row"><span class="memory-key" data-i18n="perf.memory_peak">Peak heap used</span><span class="memory-val">8.7 MB <span class="sub">(baseline 4.2)</span></span></div>
-        <div class="memory-row"><span class="memory-key" data-i18n="perf.memory_external">External buffers</span><span class="memory-val">1.2 MB</span></div>
-        <div class="memory-row"><span class="memory-key" data-i18n="perf.memory_growth">Avg per-probe growth</span><span class="memory-val">+0.6 MB</span></div>
+        <div class="memory-row"><span class="memory-key" data-i18n="perf.memory_peak">Peak heap used</span><span class="memory-val">not measured</span></div>
+        <div class="memory-row"><span class="memory-key" data-i18n="perf.memory_external">External buffers</span><span class="memory-val">not measured</span></div>
+        <div class="memory-row"><span class="memory-key" data-i18n="perf.memory_growth">Avg per-probe growth</span><span class="memory-val">not measured</span></div>
       </div>
     </div>
-    <p class="next-footer" data-i18n="perf.note">Timing is one run. For statistically meaningful percentiles, use autocannon or k6 (see Next steps).</p>
+    <p class="next-footer" data-i18n="perf.note">These bars are demo data, not a timing run. For statistically meaningful percentiles, use autocannon or k6 (see Next steps).</p>
   </div>
 </section>
 
@@ -645,7 +649,7 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid
     <h2 class="h2" data-i18n="env.title">Environment</h2>
     <p class="lead" data-i18n="env.desc">Snapshot of the systems that produced the observations.</p>
     <div class="env-grid" id="envGrid"></div>
-    <p class="next-footer" data-i18n="env.note">ICU versions match but behaviors differ — this is the exact scenario Materna exists to detect.</p>
+    <p class="next-footer" data-i18n="env.note">The versions above are demo placeholders. A generated report prints the <code>environment</code> block each probe actually recorded.</p>
   </div>
 </section>
 
@@ -653,7 +657,7 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid
 <section class="panel" data-panel="raw" role="tabpanel">
   <div class="container section-pad">
     <h2 class="h2" data-i18n="raw.title">Raw observation</h2>
-    <p class="lead" data-i18n="raw.desc">Complete JSON payload that produced this report.</p>
+    <p class="lead" data-i18n="raw.desc">Placeholder JSON. A generated report inlines the two observations it was rendered from, verbatim.</p>
     <div class="raw-toolbar">
       <span class="raw-size" id="rawSize">—</span>
       <div class="raw-actions">
@@ -719,7 +723,7 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid
 const PROBES = [
   { id:"sv-SE", nameKey:"locale.sv", status:"difference",
     corpus:["a","z","ä","å"],
-    node:{ order:["a","z","ä","å"], hash:"e3b0c442", timing:2.14, heap:8.7 },
+    node:{ order:["a","z","ä","å"], hash:"e3b0c442", timing:2.14, heap:8.7 }, // demo literals, never measured
     pg:{ order:["a","ä","å","z"], hash:"8d4c9e12", timing:4.87 } },
   { id:"de-DE", nameKey:"locale.de", status:"difference",
     corpus:["s","ss","ß"],
