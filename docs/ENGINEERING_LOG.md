@@ -118,7 +118,7 @@ supplied as `materna-loop-001-repo.zip` and had never been committed.
 | `docs/report/index.html` | Banner names the real command; every invented figure replaced with "not measured" or relabelled as demo data; header comment states what the file is and is not |
 | `index.html` | Three mangled status rows repaired (`VERIFIED · LOCAL PG 16`, `IMPLEMENTED`, `DEFINED · UNEXECUTED`), unclosed spans closed, report row added |
 | `README.md`, `docs/README.md` | Document `materna report`, the two invariants, determinism and the escaping model |
-| `.github/workflows/ci.yml` | New step renders a report from a real comparison and asserts exit-code parity, status parity, byte-identical re-render, and absence of placeholder metrics |
+| `.github/workflows/ci.yml` (supplied as a patch, see §F) | New step renders a report from a real comparison and asserts exit-code parity, status parity, byte-identical re-render, and absence of placeholder metrics |
 
 ### F. Test and CI evidence
 
@@ -135,8 +135,22 @@ supplied as `materna-loop-001-repo.zip` and had never been committed.
   page, the other expected a benign non-BMP string to be removed rather than
   escaped. Both assertions were corrected; the renderer was not changed. Recorded
   because "the test was wrong" is the most common way a green suite becomes a lie.
-- Hosted CI: recorded honestly in the pull request. A workflow file existing is
-  E1; only an executed run on a hosted runner is hosted-execution evidence.
+- Hosted CI: **NOT EXECUTED for this branch.** The delivery credential carries
+  `repo` + `admin:org` but not `workflow`, and GitHub rejected the push with
+  `refusing to allow a Personal Access Token to create or update workflow
+  .github/workflows/ci.yml without workflow scope`. Rather than drop the CI work,
+  the branch was rebuilt without `.github/`, and the verified workflow is handed
+  to the owner as `ci-report-verification.patch` to apply with a workflow-scoped
+  credential. Consequence, stated plainly: **no workflow exists on the base
+  branch, so this pull request ran zero checks.** A workflow file existing is E1;
+  only an executed run on a hosted runner is hosted-execution evidence, and there
+  is none here.
+- Local substitute for that missing hosted run: the exact CI assertions were
+  replayed by hand against a real PostgreSQL 16.15 and passed — report exit code
+  equals compare exit code (both 1, DIFFERENCE), `data-outcome-status` matched,
+  corpus-verification attribute present, second render byte-identical (`cmp`),
+  and every placeholder literal absent. That is E2/E3 evidence for the
+  assertions, not for the workflow's execution.
 
 ### G. Security findings
 
