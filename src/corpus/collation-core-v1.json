@@ -1,0 +1,23 @@
+{
+  "id": "collation-core-v1",
+  "version": "1",
+  "description": "Immutable locale-sensitive collation sample set. Do not edit in place: the id, version and hash are recorded in every observation, so changing these samples changes the meaning of every comparison.",
+  "samples": [
+    "apple",
+    "\u00e4pfel",
+    "zebra",
+    "\u00c4rger",
+    "\u00e5land",
+    "\u00f6rebro",
+    "\u0130stanbul",
+    "istanbul",
+    "\u0131lgaz",
+    "caf\u00e9",
+    "cafe\u0301",
+    "\u0985",
+    "\u0986",
+    "\ud83d\ude00",
+    "item9",
+    "item10"
+  ]
+}

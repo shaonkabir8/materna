@@ -109,13 +109,18 @@ The existing adapter:
 - Records collation metadata.
 - Hashes the actual observed ordering.
 
-Verification limitation
+Verification status for live PostgreSQL
 
-PostgreSQL live integration is not verified in this environment.
+Live PostgreSQL execution has been established against PostgreSQL 16.15 on Linux (x86_64) through this adapter.
 
-The PostgreSQL dependency/runtime verification remains blocked. A successful live execution must be established against an accessible PostgreSQL instance with the required Node.js dependencies installed.
+Observed evidence from that run:
 
-The presence of PostgreSQL adapter source code does not constitute proof of successful live integration.
+- the probe returns a well-formed, self-consistent observation;
+- the observed ordering contains all 16 corpus samples, including the emoji and the decomposed/café form, so no text was lost or transformed in transit;
+- repeating the probe yields the same result fingerprint;
+- the session temporary table is not left behind (count of "materna_probe_%" relations is unchanged).
+
+Boundary: this is one server version on one operating system. Other PostgreSQL versions, providers and operating systems are UNVERIFIED.
 
 3. Test a Named PostgreSQL Collation
 
@@ -172,17 +177,28 @@ An unexpected adapter or execution failure occurs.
 
 Errors must not be silently converted into successful comparisons.
 
-Important: CLI limitation
+CLI: compare is executable
 
-The "compare" CLI mode is informational only.
+The CLI compares two observation documents:
 
-node src/cli.js compare
+node src/cli.js compare --left de.json --right pg.json
 
-It does not execute a comparison workflow. It exits with status "2" and directs users to the programmatic "compareObservations()" API.
+Use "-" for either side to read that document from stdin. Add --json for
+machine-readable output.
 
-The existing CLI does not currently provide a complete two-observation comparison command.
+Exit codes are a contract:
 
-Do not interpret the informational CLI mode as an implemented executable comparison workflow.
+Property| Value
+PASS| 0
+DIFFERENCE| 1
+INCONCLUSIVE| 2
+ERROR| 3
+
+INCONCLUSIVE covers four distinct situations, and the CLI names which one
+applied: missing evidence, an observation whose declared fingerprint does not
+match its own observed result, unreadable or malformed input, and two
+observations that were never comparable because their declarations differ
+(locale, sensitivity, numeric, corpus, probe version).
 
 5. Deterministic Evidence
 
@@ -238,7 +254,7 @@ The current P0 foundation does not establish:
 - Hosted control-plane correctness.
 - Production-scale operation.
 - Complete PostgreSQL collation compatibility.
-- A complete CLI-based comparison workflow.
+- Cross-version, cross-provider, or cross-OS PostgreSQL verification.
 - Universal runtime compatibility.
 - Market demand.
 
@@ -251,9 +267,11 @@ Node.js deterministic probe| PASS — source test
 Controlled behavioral difference| PASS — source test
 Metadata-only false-positive resistance| PASS — source test
 Missing evidence handling| PASS — source test
-PostgreSQL adapter implementation| PRESENT
-PostgreSQL live execution| NOT VERIFIED IN THIS ENVIRONMENT
-Compare CLI execution| INFORMATIONAL ONLY
+Node.js probe| IMPLEMENTED
+PostgreSQL adapter implementation| IMPLEMENTED
+PostgreSQL live execution| VERIFIED — PostgreSQL 16.15, Linux x86_64 (single environment)
+Compare CLI execution| IMPLEMENTED — exit-code contract documented
+Hash-integrity rejection| IMPLEMENTED — recomputed, not trusted
 Programmatic comparison API| IMPLEMENTED
 Production readiness| NOT CLAIMED
 Overall technical PASS| NOT CLAIMED

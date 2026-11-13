@@ -1,9 +1,6 @@
-<div align="center"> 
-  <h1>Materna</h1>  
-  <p>
-    <strong>Seamless i18n to read, understand, and learn in any native tongue.
-  </p>  
-   <!-- Badges -->  
+<div align="center">
+  <h1>Materna</h1>
+  <p><strong>Behavioral locale parity probing for Node.js and PostgreSQL.</strong></p>
   <p>
     <a href="https://github.com/shaonkabir8/materna">
       <img src="https://img.shields.io/github/stars/shaonkabir8/materna?style=flat-square" alt="GitHub Stars" />
@@ -11,171 +8,172 @@
     <a href="https://github.com/shaonkabir8/materna/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/shaonkabir8/materna?style=flat-square" alt="License" />
     </a>
-    <a href="https://github.com/shaonkabir8/materna">
-      <img src="https://img.shields.io/github/commit-activity/m/shaonkabir8/materna?style=flat-square" alt="Commit Activity" />
-    </a>
     <a href="https://github.com/shaonkabir8/materna/pulls">
       <img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs Welcome" />
     </a>
-  </p>  
+  </p>
   <p>
-    <a href="#-the-problem">The Problem</a> •
-    <a href="#-features">Features</a> •
-    <a href="#-installation">Installation</a> •
-    <a href="#-quick-start">Quick Start</a> •
-    <a href="#-interactive-examples">Interactive Examples</a> •
-    <a href="#-contributing">Contributing</a>
+    <a href="#what-materna-is">What it is</a> •
+    <a href="#install">Install</a> •
+    <a href="#run">Run</a> •
+    <a href="#api">API</a> •
+    <a href="#what-the-output-means">Output</a> •
+    <a href="#limitations">Limitations</a> •
+    <a href="#verify-it-yourself">Verify</a>
   </p>
 </div>
 
 ---
 
-## 🎯 About Materna
+## What Materna is
 
-**Materna** is a behavioral `i18n` testing framework designed to detect real **collation, sorting, and Unicode differences** across **Node.js, PostgreSQL, ICU, CLDR**, and other runtime environments. 
+Materna is a small engineering utility: it **observes** locale-sensitive collation
+in Node.js and in PostgreSQL, normalises both observations, fingerprints them with
+SHA-256, and **compares the fingerprints**.
 
-When your application and database disagree on how native strings are sorted, compared, or normalized, silent bugs happen. Materna catches these discrepancies before they reach production—ensuring users can **read, understand, and learn in any native tongue** without broken search, sorting, or filtering.
+Versions are metadata. Observed behavior is evidence.
 
----
+The tool does not declare a mismatch because ICU, CLDR, glibc or PostgreSQL
+versions differ. It declares a mismatch only when two runs over the *same*
+declared probe and corpus produce different observed orderings or different
+tie structures.
 
-## ⚠️ The Problem It Solves
-
-Different runtimes ship with different versions of **ICU** (International Components for Unicode) or OS-level **glibc** locales:
-- **Node.js** might sort `['ä', 'z', 'a']` differently than **PostgreSQL** (`ORDER BY`).
-- Case-folding (`toLowerCase()` vs `LOWER()`) can behave inconsistently in locales like Turkish (`tr-TR`) or Lithuanian (`lt-LT`).
-- Diacritics and Unicode normalization (`NFC` vs `NFD`) may cause mismatches between app-level validation and database unique constraints.
-
-**Materna automates behavioral testing across your stack to guarantee consistent i18n behavior.**
-
----
-
-## ✨ Key Features
-
-- 🔍 **Cross-Runtime Collation Diffing:** Compare string sorting and comparison rules between Node.js (`Intl.Collator`) and databases like PostgreSQL.
-- 🗄️ **Database Consistency Verification:** Detect mismatches caused by `glibc` vs `ICU` provider differences in PostgreSQL.
-- 🧪 **Behavioral i18n Test Suites:** Pre-built edge-case datasets for complex scripts, diacritics, emojis, and locale-specific casing.
-- ⚙️ **CI/CD Ready:** Catch environment drift between macOS (local dev) and Linux (production containers) automatically.
-- 📊 **Clear Diff Reports:** Pinpoint the exact strings, locales, and rules where runtime and database behaviors diverge.
-
----
-
-## 📦 Installation
-
-Install **Materna** via your favorite package manager:
+## Install
 
 ```bash
-# Using npm
-npm install --save-dev materna
-
-# Using yarn
-yarn add --dev materna
-
-# Using pnpm
-pnpm add -D materna
+git clone https://github.com/shaonkabir8/materna.git
+cd materna
+npm install
 ```
 
----
+Requires Node.js 20+. The single runtime dependency is `pg`, used only by the
+PostgreSQL probe.
 
-## 🚀 Quick Start
+## Run
 
-Run a behavioral collation check between your Node.js runtime and PostgreSQL database:
+```bash
+# Probe the Node.js runtime
+npm run probe:node
 
-```javascript
-import { checkCollation } from 'materna';
+# Probe PostgreSQL (DATABASE_URL is honoured; a local default is used otherwise)
+DATABASE_URL='postgresql://postgres:postgres@localhost:5432/localeparity' npm run probe:postgres
 
-const report = await checkCollation({
-  locales: ['en-US', 'de-DE', 'sv-SE', 'tr-TR', 'bn-BD'],
-  targets: {
-    runtime: 'node',
-    database: {
-      client: 'pg',
-      connectionString: process.env.DATABASE_URL,
-    },
-  },
-  samples: ['apple', 'äpfel', 'zebra', 'İstanbul', 'istanbul', 'অ', 'আ'],
+# Compare two observations
+node src/cli.js compare --left de.json --right pg.json
+
+# Same, machine-readable
+node src/cli.js node --json > de.json
+node src/cli.js postgres --json > pg.json
+node src/cli.js compare --left de.json --right pg.json --json
+```
+
+Flags for `node` and `postgres`: `--locale`, `--sensitivity` (`base`, `accent`,
+`case`, `variant`), `--numeric`, `--corpus`, `--json`.
+
+Environment: `DATABASE_URL`, and `PG_COLLATION` to force a named PostgreSQL
+collation in `ORDER BY`.
+
+### Exit codes
+
+| Code | Status | Meaning |
+|---:|:---|:---|
+| 0 | `PASS` | Fingerprints match |
+| 1 | `DIFFERENCE` | Fingerprints differ; the first differing position is printed |
+| 2 | `INCONCLUSIVE` | Evidence missing, unsupported locale, unreadable input, or observations that are not comparable |
+| 3 | `ERROR` | Malformed JSON, bad arguments, unsafe identifier, driver failure |
+
+## API
+
+```js
+import { probeNode, probePostgres, compareObservations } from 'materna';
+
+const left = probeNode({ locale: 'de-DE' });
+const right = await probePostgres({
+  locale: 'de-DE',
+  connectionString: process.env.DATABASE_URL,
 });
 
-if (!report.isConsistent) {
-  console.error('❌ Collation mismatch detected:', report.diffs);
-  process.exit(1);
+const outcome = compareObservations(left, right);
+
+if (outcome.status === 'INCONCLUSIVE') {
+  // Missing or non-comparable evidence. Never treat this as compatibility.
+  throw new Error(outcome.reason);
 }
 
-console.log('✅ 100% Runtime & Database Consistency!');
+if (outcome.status === 'DIFFERENCE') {
+  console.error(outcome.first_difference);
+  process.exit(1);
+}
 ```
 
----
+Also exported: `loadCorpus`, `validateObservation`, `canonicalJson`,
+`resultHash`, `sha256Hex`, `firstDifference`, `STATUS`, `OBSERVATION_SCHEMA`.
 
-## 🎮 Interactive Examples (Click to Expand)
+## What the output means
 
-Explore real-world locale edge cases that **Materna** detects automatically:
+An observation records four things separately:
 
-<details>
-<summary><b>1. German & Swedish Sorting Discrepancies (<code>de-DE</code> vs <code>sv-SE</code>)</b></summary>
-<br>
+| Section | Contents |
+|:---|:---|
+| `probe` | What was declared: property, version, locale, resolved locale, support flag, sensitivity, numeric |
+| `corpus` | Input identity: `collation-core-v1@1` plus a hash of the samples |
+| `environment` | Node/ICU/Unicode/V8, or PostgreSQL version, encoding, `datcollate`, collation provider |
+| `result` | The observed ordering, the observed tie groups, and `result_hash` |
 
-In German (`de-DE`), `'ä'` sorts near `'a'`, whereas in Swedish (`sv-SE`), `'ä'` sorts after `'z'`. If your Node.js container uses ICU and your Postgres instance uses `C.UTF-8` or mismatched glibc locales, pagination breaks:
+`result_hash` is SHA-256 over the canonical JSON of `{order, ties}`. Ties are
+included because two runtimes can agree on order while disagreeing on which
+values are equal.
 
-```javascript
-// Node.js (ICU sv-SE): ['a', 'z', 'ä']
-// PostgreSQL (mismatched): ['a', 'ä', 'z']
+Comparison rules:
 
-// Materna flags this immediately:
-// Diff: Index mismatch at position 1 for locale 'sv-SE'
+- Fingerprints match → `PASS`. A differing `environment` is reported as
+  `metadata_differences` and is **not** a failure.
+- Fingerprints differ → `DIFFERENCE`, with `first_difference`.
+- Observed evidence missing → `INCONCLUSIVE`.
+- Declarations differ (`locale`, `sensitivity`, `numeric`, `corpus`, probe
+  version) → `INCONCLUSIVE`, because the fingerprints were never comparable.
+- A declared `result_hash` that does not match the observed ordering →
+  `INCONCLUSIVE`. A self-inconsistent document is not evidence.
+- Unsafe collation identifier → `ERROR`, rejected before any connection is
+  opened.
+
+## Limitations
+
+- Two proven probes only: Node.js `Intl.Collator` and PostgreSQL `ORDER BY`.
+  MySQL, SQLite and browser runtimes are not implemented.
+- PostgreSQL support is verified against PostgreSQL 16.15 on Linux. Other
+  versions and other operating systems are not verified here.
+- The default PostgreSQL connection uses `C.UTF-8` unless `PG_COLLATION` names
+  another collation, so a `DIFFERENCE` against Node's ICU ordering is expected
+  and is a property of that configuration, not a bug.
+- The corpus is deliberately small (16 samples). It targets specific
+  discriminators, not exhaustive CLDR coverage.
+- Ties are only collected when a named collation is used.
+- No hosted control plane, no production-scale claims, no market claims.
+
+## Verify it yourself
+
+```bash
+npm test
 ```
-</details>
 
-<details>
-<summary><b>2. The Turkish Dotted/Dotless I Problem (<code>tr-TR</code>)</b></summary>
-<br>
+The suite covers canonical serialisation, fingerprint stability, corpus
+immutability, probe determinism, the `de-DE` vs `sv-SE` ordering split, the
+Turkish dotted/dotless I case, unsupported-locale fallback, tie-structure
+differences, metadata-only false-positive resistance, missing-evidence handling,
+hash-tampering detection, collation-identifier injection, and — when
+`DATABASE_URL` is reachable — live PostgreSQL probing including a check that the
+temporary table is not left behind.
 
-Lowercasing `'I'` in Turkish produces `'ı'` (dotless i), not `'i'`. Materna verifies that your runtime and database case-insensitive queries agree:
+Live database tests **skip** when no server is reachable. A skipped test is
+recorded as skipped, never as a pass.
 
-```javascript
-const testResult = await verifyCaseConsistency({
-  locale: 'tr-TR',
-  input: 'İSTANBUL',
-});
-// Ensures Node.js .toLocaleLowerCase('tr-TR') === PostgreSQL LOWER('İSTANBUL' COLLATE "tr-TR")
-```
-</details>
+## Contributing
 
-<details>
-<summary><b>3. macOS vs Linux Container Drift in CI/CD</b></summary>
-<br>
+Adapters for other runtimes, a larger corpus, and richer reporters are welcome.
+Keep changes small, add a behavioural test, and do not claim a result you have
+not observed.
 
-Developers on macOS often experience different `glibc`/`ICU` behavior than Linux Docker images. Add Materna to your GitHub Actions workflow to catch environment drift:
+## License
 
-```yaml
-- name: Verify i18n Behavior
-  run: npx materna verify --locales en-US,fr-FR,ja-JP --db \$DATABASE_URL
-```
-</details>
-
----
-
-## 🏷️ Repository Topics
-
-`i18n` • `internationalization` • `localization` • `locale-testing` • `collation` • `postgresql` • `nodejs` • `icu` • `cldr` • `unicode` • `database-testing` • `behavioral-testing`
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Whether it's adding new database adapters (MySQL, SQLite), expanding CLDR edge-case datasets, or improving diff reporters, feel free to open a Pull Request.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/mysql-adapter`)
-3. Commit your Changes (`git commit -m 'Add MySQL collation support'`)
-4. Push to the Branch (`git push origin feature/mysql-adapter`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-Distributed under the **MIT License**. See `LICENSE` for more information.
-
-<div align="center">
-  <br>
-  <p>Built with ❤️ to ensure reliable i18n across every runtime, database, and native language.</p>
-</div>
+MIT — see [`LICENSE`](LICENSE).
