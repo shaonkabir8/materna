@@ -10,6 +10,8 @@ import { createHash } from 'node:crypto';
 
 export const OBSERVATION_SCHEMA = 'materna.observation/1';
 
+const SHA256_HEX = /^[0-9a-f]{64}$/;
+
 /**
  * Deterministic JSON: object keys are sorted, so two logically identical
  * documents always serialise to the same bytes.
@@ -47,6 +49,128 @@ export function resultHash(order, ties) {
   return sha256Hex(canonicalJson(normalizedResult(order, ties)));
 }
 
+/**
+ * A multiset of the observed values, used to ask "is this ordering a
+ * rearrangement of the corpus, or something else?".
+ */
+export function multiset(values) {
+  const counts = new Map();
+  for (const value of values) {
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function sameMultiset(left, right) {
+  const leftCounts = multiset(left);
+  const rightCounts = multiset(right);
+  if (leftCounts.size !== rightCounts.size) return false;
+  for (const [value, count] of leftCounts) {
+    if (rightCounts.get(value) !== count) return false;
+  }
+  return true;
+}
+
+/**
+ * Structural problems with an observed ordering. A non-string member is not an
+ * ordering: it is a malformed observation, and it must never compare as PASS.
+ * An ordering is not trusted merely because it hashes consistently.
+ */
+export function orderProblems(order) {
+  if (!Array.isArray(order)) {
+    return ['result.order (not an array)'];
+  }
+
+  const problems = [];
+  order.forEach((value, index) => {
+    if (typeof value !== 'string') {
+      problems.push(`result.order[${index}] (not a string)`);
+    } else if (value.length === 0) {
+      problems.push(`result.order[${index}] (empty string)`);
+    }
+  });
+  return problems;
+}
+
+/**
+ * Structural problems with the observed tie structure. A tie group must name
+ * at least two distinct members that the observation actually ordered; a tie
+ * group referring to values that were never observed is fabricated evidence.
+ */
+export function tieProblems(order, ties) {
+  if (!Array.isArray(ties)) {
+    return ['result.ties (not an array)'];
+  }
+
+  const present = new Set(Array.isArray(order) ? order.filter((value) => typeof value === 'string') : []);
+  const seenGroups = new Set();
+  const problems = [];
+
+  ties.forEach((group, index) => {
+    if (!Array.isArray(group)) {
+      problems.push(`result.ties[${index}] (not an array)`);
+      return;
+    }
+    if (group.length < 2) {
+      problems.push(`result.ties[${index}] (fewer than 2 members)`);
+      return;
+    }
+
+    const members = new Set();
+    for (const member of group) {
+      if (typeof member !== 'string') {
+        problems.push(`result.ties[${index}] (member is not a string)`);
+        continue;
+      }
+      if (!present.has(member)) {
+        problems.push(`result.ties[${index}] (member ${JSON.stringify(member)} is not in result.order)`);
+      }
+      if (members.has(member)) {
+        problems.push(`result.ties[${index}] (duplicate member ${JSON.stringify(member)})`);
+      }
+      members.add(member);
+    }
+
+    const key = canonicalJson([...members].sort());
+    if (seenGroups.has(key)) {
+      problems.push(`result.ties[${index}] (duplicate tie group)`);
+    }
+    seenGroups.add(key);
+  });
+
+  return problems;
+}
+
+/**
+ * Cross-check an observation against a corpus it claims to have observed.
+ *
+ * Three independent claims are checked, because each one is separately
+ * forgeable: the declared corpus identity, the declared corpus hash, and the
+ * claim that the ordering is a rearrangement of exactly those samples.
+ */
+export function corpusConformance(observation, corpus) {
+  const problems = [];
+  const declared = observation?.corpus ?? {};
+  const declaredVersion = declared.version === undefined ? null : String(declared.version);
+
+  if (declaredVersion !== String(corpus.version)) {
+    problems.push(`corpus.version (declares ${JSON.stringify(declaredVersion)}, corpus is ${JSON.stringify(String(corpus.version))})`);
+  }
+
+  if (declared.hash !== corpus.hash) {
+    problems.push('corpus.hash (does not match the corpus it names)');
+  }
+
+  const order = Array.isArray(observation?.result?.order) ? observation.result.order : [];
+  if (!sameMultiset(order, corpus.samples)) {
+    problems.push(
+      `result.order (is not a rearrangement of the ${corpus.samples.length} declared corpus samples; observed ${order.length})`,
+    );
+  }
+
+  return problems;
+}
+
 export function buildObservation({
   property,
   probeVersion,
@@ -68,6 +192,10 @@ export function buildObservation({
   }
   if (corpus === null || typeof corpus !== 'object') {
     throw new TypeError('buildObservation: corpus is required');
+  }
+  const malformed = orderProblems(order);
+  if (malformed.length > 0) {
+    throw new TypeError(`buildObservation: ${malformed.slice(0, 3).join(', ')}`);
   }
 
   const frozenOrder = [...order];
@@ -144,14 +272,18 @@ export function validateObservation(observation) {
       continue;
     }
 
-    if (path === 'result.result_hash' && !/^[0-9a-f]{64}$/.test(String(value))) {
+    if (path === 'result.result_hash' && !SHA256_HEX.test(String(value))) {
       missing.push(`${path} (not sha-256 hex)`);
     }
   }
 
-  if (observation.result !== null && typeof observation.result === 'object'
-    && Array.isArray(observation.result.ties) === false) {
-    missing.push('result.ties (not an array)');
+  if (observation.result !== null && typeof observation.result === 'object') {
+    if (Array.isArray(observation.result.order)) {
+      missing.push(...orderProblems(observation.result.order));
+      missing.push(...tieProblems(observation.result.order, observation.result.ties ?? []));
+    } else if (Array.isArray(observation.result.ties) === false) {
+      missing.push('result.ties (not an array)');
+    }
   }
 
   // The declared fingerprint must be reproducible from the observed ordering.
