@@ -1,0 +1,104 @@
+name: CI
+
+# Verification workflow. It gates pull requests and pushes to the default
+# branch, and it is the only workflow that runs on untrusted code — so it holds
+# read-only repository permissions and never receives a secret.
+#
+# Every third-party action is pinned to a full commit SHA. A floating tag such
+# as `@v4` is mutable: whoever can move the tag can run code in this workflow.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: node ${{ matrix.node }} / postgres ${{ matrix.postgres }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Node 22 is the declared floor in package.json ("engines"). Node 20
+        # reached end of life on 2026-04-30 per the official release schedule,
+        # so it is no longer advertised as supported even though the suite still
+        # passes on it. 22 is Maintenance LTS; 24 and 26 are the LTS lines.
+        # Each line is executed, not merely declared.
+        node: ['22', '24', '26']
+        postgres: ['14', '16']
+
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: localeparity
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d localeparity"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/localeparity
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.3.0
+
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      # `npm ci` installs exactly what the lockfile pins and fails when the
+      # lockfile and package.json disagree, which a plain `npm install` would
+      # silently "fix".
+      - name: Install dependencies from the lockfile
+        run: npm ci
+
+      - name: Run the test suite against a live PostgreSQL server
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee tap.txt
+
+      # A skipped integration test is missing evidence, not evidence of
+      # compatibility. This step is what makes a green pipeline mean "the
+      # database tests actually ran" instead of "nothing was verified".
+      - name: Assert no test was skipped
+        shell: bash
+        run: |
+          node -e '
+            const text = require("node:fs").readFileSync("tap.txt", "utf8");
+            // Node <= 22 prints the summary as "# skipped N"; Node >= 24 prints
+            // "\u2139 skipped N". Both must be recognised, otherwise this gate
+            // would fail closed on the newer runtimes for no real reason.
+            const match = text.match(/^(?:#|\u2139) skipped (\d+)$/m);
+            if (!match) { console.error("no TAP summary found"); process.exit(1); }
+            if (match[1] !== "0") { console.error(`skipped ${match[1]} test(s) \u2014 live evidence missing`); process.exit(1); }
+            console.log("skipped 0");
+          '
+
+      # The tarball is the artifact consumers install, so its inventory is
+      # validated on every supported runtime rather than only before a release.
+      - name: Validate the package tarball inventory
+        run: npm pack --dry-run
+
+      - name: Audit runtime dependencies
+        run: npm audit --omit=dev
