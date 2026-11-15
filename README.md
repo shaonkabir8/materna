@@ -40,32 +40,62 @@ tie structures.
 
 ## Install
 
+As a dependency:
+
+```bash
+npm install materna
+```
+
+As a CLI, without writing it into a project:
+
+```bash
+npx materna node
+```
+
+From source (the only route that currently works end to end — see
+[release status](#release-status)):
+
 ```bash
 git clone https://github.com/shaonkabir8/materna.git
 cd materna
 npm install
 ```
 
-Requires Node.js 20+. The single runtime dependency is `pg`, used only by the
-PostgreSQL probe.
+Requires Node.js 22+ (executed on 22, 24 and 26). The single runtime dependency
+is `pg`, used only by the PostgreSQL probe; it is imported dynamically, so
+`import 'materna'` and `materna node` work with no database driver loaded and no
+dashboard or build step.
+
+PostgreSQL is **not** required to install, import, or run the Node.js probe.
+Only `materna postgres` needs a server. Locally verified against PostgreSQL
+16.15; PostgreSQL 14 is configured in CI and has not been observed passing (see
+the [compatibility matrix](#compatibility)).
 
 ## Run
 
+Subcommands are `node`, `postgres`, `compare` and `report`. The examples below
+use the installed bin name; from a source checkout, `node src/cli.js` is
+equivalent.
+
 ```bash
 # Probe the Node.js runtime
-npm run probe:node
+materna node
 
 # Probe PostgreSQL (DATABASE_URL is honoured; a local default is used otherwise)
-DATABASE_URL='postgresql://postgres:postgres@localhost:5432/localeparity' npm run probe:postgres
+DATABASE_URL='postgresql://postgres:postgres@localhost:5432/localeparity' materna postgres
 
 # Compare two observations
-node src/cli.js compare --left de.json --right pg.json
+materna compare --left de.json --right pg.json
 
 # Same, machine-readable
-node src/cli.js node --json > de.json
-node src/cli.js postgres --json > pg.json
-node src/cli.js compare --left de.json --right pg.json --json
+materna node --json > de.json
+materna postgres --json > pg.json
+materna compare --left de.json --right pg.json --json
 ```
+
+`materna <command> --help` is not a subcommand flag; run `materna --help` for the
+global usage block. In a source checkout, `npm run probe:node` and
+`npm run probe:postgres` are the same two probes.
 
 Flags for `node` and `postgres`: `--locale`, `--sensitivity` (`base`, `accent`,
 `case`, `variant`), `--numeric`, `--corpus`, `--json`.
@@ -191,13 +221,59 @@ Comparison rules:
 - Unsafe collation identifier → `ERROR`, rejected before any connection is
   opened.
 
+## Compatibility
+
+Claims are separated by evidence level. **E3** = executed here, output
+recorded. **E1** = configured in the repository, not executed on hosted
+runners.
+
+| Surface | Verified | Evidence level |
+|:---|:---|:---|
+| Node.js 22.23.5, Linux x86_64, ICU 78.3 | full suite, 98/98 | E3 — executed |
+| Node.js 24.22.3, Linux x86_64 | full suite, 98/98 | E3 — executed |
+| Node.js 26.13.1, Linux x86_64 | full suite, 98/98 | E3 — executed |
+| PostgreSQL 16.15, Linux x86_64 | full suite incl. 11 live tests, 98/98 | E3 — executed |
+| PostgreSQL 14, Linux x86_64 | configured in `ci.yml` | E1 — never observed passing |
+| macOS, Windows | not executed | UNVERIFIED |
+| MySQL, SQLite, browsers | not implemented | — |
+
+`engines.node` is `>=22`, matching the oldest line that is still supported and
+that executes the full suite. Node 20 reached end of life on 2026-04-30
+([official schedule](https://raw.githubusercontent.com/nodejs/Release/main/schedule.json));
+the suite still passes on 20.20.2, but an end-of-life runtime is not advertised
+as supported, so it is neither in `engines` nor in the CI matrix.
+
+`ci.yml` also runs the TAP summary through a gate that fails the build when any
+test was skipped. That gate recognises both summary formats, because Node ≤ 22
+prints `# skipped N` while Node ≥ 24 prints `ℹ skipped N` — a gate matching only
+the first form would have failed every Node 24 and 26 job for the wrong reason.
+
+## Release status
+
+| Requirement | State |
+|:---|:---|
+| Package name `materna` on npm | **unclaimed** at the time of writing (`npm view materna` → 404) |
+| `npm install materna` | **does not work yet** — nothing has been published |
+| Package tarball | validated: `npm pack`, installed into a clean consumer project, import + bin smoke-tested |
+| CI workflow (`.github/workflows/ci.yml`) | committed, **not yet executed** on hosted runners (E1) |
+| Release workflow (`.github/workflows/release.yml`) | committed, **blocked** on a Trusted Publisher configuration in npm package settings (E1). It refuses to publish unless CI has reported success on the exact tagged commit |
+| Publication | **not performed.** Publishing is an irreversible, human-authorized action |
+
+The unclaimed name is a snapshot of one registry lookup, not a reservation: a
+name can be taken at any time before the publish. The repository is
+`shaonkabir8/materna` and is not renamed, scoped, or republished under another
+identity.
+
 ## Limitations
 
 - Two proven probes only: Node.js `Intl.Collator` and PostgreSQL `ORDER BY`.
   MySQL, SQLite and browser runtimes are not implemented.
-- PostgreSQL support is verified against PostgreSQL 18.6 on Linux (x86_64) in
-  this revision, and in a Node 20/22 × PostgreSQL 14/16 CI matrix whose workflow
-  is committed but has not yet executed on hosted runners. See
+- PostgreSQL support is verified against PostgreSQL 16.15 on Linux (x86_64) for
+  this revision. PostgreSQL 14 is configured in the CI matrix but its
+  integration tests have **not** been observed passing, so it is not called
+  verified. `docs/ENGINEERING_LOG.md` records PostgreSQL 18.6 from an earlier
+  loop; that run was not reproduced for this commit and is treated as historical
+  documentation, not as current evidence. See
   [`docs/ENGINEERING_LOG.md`](docs/ENGINEERING_LOG.md) for the exact evidence
   level behind each claim.
 - Integrity is not authenticity. An attacker who recomputes `result_hash` over a
