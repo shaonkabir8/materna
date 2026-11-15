@@ -44,6 +44,8 @@ Usage:
   materna postgres                    Probe PostgreSQL collation and print the observation
   materna compare --left <path> --right <path>
                                       Compare two observation documents (use "-" for stdin)
+  materna report  --left <path> --right <path>
+                                      Render that comparison as a deterministic HTML page
 
 Options for node/postgres:
   --locale <tag>        Locale to probe (default: de-DE)

@@ -2,7 +2,7 @@
   "name": "materna",
   "version": "0.1.0",
   "private": false,
-  "description": "Materna: behavioral locale parity probing for Node.js and PostgreSQL",
+  "description": "Behavioral locale parity probing for Node.js and PostgreSQL",
   "type": "module",
   "main": "./src/index.js",
   "exports": {
@@ -24,15 +24,34 @@
   "bugs": {
     "url": "https://github.com/shaonkabir8/materna/issues"
   },
+  "license": "MIT",
+  "author": "Shaon Kabir",
+  "keywords": [
+    "collation",
+    "locale",
+    "i18n",
+    "icu",
+    "cldr",
+    "postgresql",
+    "postgres",
+    "parity",
+    "testing",
+    "unicode"
+  ],
   "scripts": {
     "test": "node --test",
     "probe:node": "node src/cli.js node",
-    "probe:postgres": "node src/cli.js postgres"
+    "probe:postgres": "node src/cli.js postgres",
+    "prepublishOnly": "npm test"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "pg": "^8.16.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

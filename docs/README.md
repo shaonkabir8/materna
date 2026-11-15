@@ -34,6 +34,8 @@ Requirements
 
 - Node.js 20+
 - PostgreSQL 14+ for live PostgreSQL probing.
+- Node.js 22 or newer. The suite is executed on 22, 24 and 26; Node 20 reached
+  end of life on 2026-04-30 and is no longer a supported runtime.
 - npm.
 - The project's declared dependencies installed.
 
@@ -111,7 +113,12 @@ The existing adapter:
 
 Verification status for live PostgreSQL
 
-Live PostgreSQL execution has been re-established against PostgreSQL 18.6 on Linux (x86_64) through this adapter in this revision.
+**Historical record, not current evidence.** This section documents an earlier
+loop. Live PostgreSQL execution was demonstrated against PostgreSQL 18.6 on
+Linux (x86_64) at that time. That run was not reproduced for the current release
+candidate; the version verified for this revision is PostgreSQL 16.15, and
+PostgreSQL 14 is CI-configured only. See the compatibility matrix in the root
+`README.md` for the current, version-labelled evidence.
 
 Observed evidence from that run:
 
@@ -278,8 +285,8 @@ Metadata-only false-positive resistance| PASS — source test
 Missing evidence handling| PASS — source test
 Node.js probe| IMPLEMENTED
 PostgreSQL adapter implementation| IMPLEMENTED
-PostgreSQL live execution| VERIFIED — PostgreSQL 18.6, Linux x86_64 (single environment, E3)
-Collation selection (`--collation`)| IMPLEMENTED — catalog-resolved; live tests on 18.6
+PostgreSQL live execution| HISTORICAL — PostgreSQL 18.6, Linux x86_64, an earlier loop. Not reproduced for 0.1.0; current local evidence is 16.15
+Collation selection (`--collation`)| IMPLEMENTED — catalog-resolved; live tests on 16.15
 Observation corpus conformance| IMPLEMENTED — ordering must be a rearrangement of the named corpus
 CONTINUOUS INTEGRATION| DEFINED — workflow committed, not yet executed on hosted runners (E1)
 Compare CLI execution| IMPLEMENTED — exit-code contract documented
