@@ -178,6 +178,20 @@ export async function probePostgres(options = {}) {
   const table = `materna_probe_${process.pid}_${Date.now()}`;
 
   try {
+    // `pg_database.datlocprovider` exists only on PostgreSQL 15+, where it was
+    // introduced alongside database-level ICU locales. Referencing it on a
+    // PostgreSQL 14 server fails the whole statement at parse time with
+    // SQLSTATE 42703 ("column d.datlocprovider does not exist"), which used to
+    // take down every live probe on PG14. Gate the column reference on the
+    // server's own version number: the PG15/16 statement text is unchanged,
+    // while PG14 reports locale_provider as null — which is truthful, because
+    // a PG14 database's locale provider is always libc.
+    const { rows: serverVersionNumRows } = await client.query(
+      `SELECT current_setting('server_version_num')::int AS server_version_num`,
+    );
+    const hasDatlocprovider =
+      (serverVersionNumRows[0]?.server_version_num ?? 0) >= 150000;
+
     const version = await client.query(
       // lc_collate / lc_ctype are not GUCs on PostgreSQL 16 (only lc_messages,
       // lc_monetary, lc_numeric and lc_time are), so database-level values are
@@ -185,8 +199,8 @@ export async function probePostgres(options = {}) {
       `SELECT version() AS version,
               current_setting('server_encoding') AS server_encoding,
               d.datcollate AS lc_collate,
-              d.datctype AS lc_ctype,
-              d.datlocprovider AS locale_provider
+              d.datctype AS lc_ctype${hasDatlocprovider ? `,
+              d.datlocprovider AS locale_provider` : ''}
          FROM pg_database d
         WHERE d.datname = current_database()`,
     );
