@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" class="light" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <meta
     name="description"
-    content="Materna is a behavioral compatibility testing foundation for comparing observed results across runtimes and data systems."
+    content="Materna is behavioral locale parity probing for Node.js and PostgreSQL. Stop comparing version numbers. Start comparing actual collation behavior."
   >
 
-  <meta name="theme-color" content="#fafafa">
+  <meta name="theme-color" content="#ffffff">
 
   <title>Materna — Behavior is the Evidence</title>
 
@@ -17,1950 +17,857 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;450;500;550;600;650;700;750&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   >
 
   <style>
-    /* =========================================
+    /* =========================================================
        MATERNA
-       Minimal behavioral compatibility UI
-       ========================================= */
+       Landing shell: sticky bar, centered hero, install box,
+       showcase grid, one-line footer.
+       Independent implementation — no framework, no build step.
+       ========================================================= */
 
     :root {
       color-scheme: light;
 
-      --bg: #fafafa;
-      --surface: #ffffff;
-      --surface-soft: #f3f3f3;
-      --surface-raised: #ffffff;
+      --bg: #ffffff;
+      --fg: #0a0a0a;
+      --muted: #f5f5f5;
+      --muted-fg: #737373;
+      --border: #e5e5e5;
+      --border-strong: #d4d4d4;
+      --card: #ffffff;
+      --code-bg: #fafafa;
 
-      --text: #171717;
-      --text-secondary: #666666;
-      --text-tertiary: #929292;
+      --dark-card: #0a0a0a;
+      --dark-card-border: #232323;
+      --dark-card-fg: #fafafa;
+      --dark-card-muted: #a3a3a3;
 
-      --border: #e8e8e8;
-      --border-strong: #d7d7d7;
-
-      --accent: #171717;
+      --accent-fg: #131313;
       --accent-contrast: #ffffff;
+      --pink: #ec4899;
 
-      --success: #26764d;
-      --warning: #a36a19;
-      --muted-status: #777777;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
 
-      --shadow:
-        0 20px 70px rgba(0, 0, 0, 0.045);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
 
-      --header-height: 76px;
-
-      --radius-sm: 10px;
-      --radius-md: 18px;
-      --radius-lg: 26px;
-
-      --container: 1120px;
+      --header-height: 56px;
+      --container: 1200px;
+      --hero-text: 672px;
 
       --font:
         "Inter",
+        ui-sans-serif,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         sans-serif;
 
       --mono:
-        "DM Mono",
-        "SFMono-Regular",
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
         Consolas,
+        "Liberation Mono",
+        "Courier New",
         monospace;
 
-      --transition:
-        220ms cubic-bezier(.2, .7, .2, 1);
+      --transition: 180ms cubic-bezier(.2, .7, .2, 1);
     }
-
 
     html[data-theme="dark"] {
-
       color-scheme: dark;
 
-      --bg: #101010;
-      --surface: #181818;
-      --surface-soft: #202020;
-      --surface-raised: #1b1b1b;
+      --bg: #0a0a0a;
+      --fg: #fafafa;
+      --muted: #171717;
+      --muted-fg: #a3a3a3;
+      --border: #262626;
+      --border-strong: #404040;
+      --card: #111111;
+      --code-bg: #1b1b1b;
 
-      --text: #f2f2f2;
-      --text-secondary: #a3a3a3;
-      --text-tertiary: #737373;
+      --dark-card: #111111;
+      --dark-card-border: #2e2e2e;
+      --dark-card-fg: #fafafa;
+      --dark-card-muted: #a3a3a3;
 
-      --border: #2b2b2b;
-      --border-strong: #414141;
-
-      --accent: #f2f2f2;
-      --accent-contrast: #111111;
-
-      --success: #75bd91;
-      --warning: #d7aa69;
-      --muted-status: #a0a0a0;
-
-      --shadow:
-        0 20px 70px rgba(0, 0, 0, 0.25);
+      --accent-fg: #fafafa;
+      --accent-contrast: #0a0a0a;
     }
-
 
     /* Reset */
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 100px;
+      scroll-padding-top: calc(var(--header-height) + 24px);
     }
 
     body {
       margin: 0;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
       background: var(--bg);
-      color: var(--text);
+      color: var(--fg);
       font-family: var(--font);
-      font-size: 15px;
-      line-height: 1.7;
-
+      font-size: 16px;
+      line-height: 1.5;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
-
-      transition:
-        background-color var(--transition),
-        color var(--transition);
     }
 
-    body,
-    button,
-    a {
-      -webkit-tap-highlight-color: transparent;
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+    :focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+      border-radius: 4px;
     }
 
-    button,
-    a {
-      font: inherit;
-    }
-
-    button {
-      color: inherit;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button:focus-visible,
-    a:focus-visible {
-      outline: 2px solid var(--text);
-      outline-offset: 5px;
-    }
-
-    ::selection {
-      background: var(--text);
-      color: var(--bg);
-    }
-
-    img,
-    svg {
-      display: block;
-      max-width: 100%;
-    }
-
-
-    /* Layout */
-
-    .section-shell {
-      width: min(
-        calc(100% - 40px),
-        var(--container)
-      );
-
-      margin-inline: auto;
-    }
-
-    .section {
-      padding-block: 110px;
-    }
-
-    .section-index,
-    .eyebrow,
-    .mono-label,
-    .visual-topline,
-    .visual-bottomline,
-    .hero-bottom,
-    .card-number,
-    .card-tag,
-    .runtime-heading,
-    .runtime-footer,
-    .architecture-header,
-    .architecture-footer,
-    .workflow-card-top,
-    .code-header,
-    .footer-label,
-    .cta-caption {
-
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-
-    /* Skip link */
-
-    .skip-link {
+    .visually-hidden {
       position: absolute;
-      top: -100px;
-      left: 20px;
-      z-index: 1000;
-      padding: 12px 16px;
-      background: var(--text);
-      color: var(--bg);
-      border-radius: var(--radius-sm);
+      width: 1px; height: 1px;
+      margin: -1px; padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
     }
 
-    .skip-link:focus {
-      top: 20px;
+    .container {
+      width: 100%;
+      max-width: var(--container);
+      margin-inline: auto;
+      padding-inline: 24px;
     }
 
-
-    /* Header */
+    /* -----------------------------------------
+       Header
+       ----------------------------------------- */
 
     .site-header {
-
       position: sticky;
       top: 0;
-      z-index: 100;
-
+      z-index: 50;
       height: var(--header-height);
-
-      background: color-mix(
-        in srgb,
-        var(--bg) 88%,
-        transparent
-      );
-
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-
+      background: var(--bg);
       border-bottom: 1px solid var(--border);
     }
 
     .nav-shell {
-
-      width: min(
-        calc(100% - 40px),
-        var(--container)
-      );
-
       height: 100%;
-      margin-inline: auto;
-
       display: flex;
       align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand {
-
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-
-      font-size: 19px;
-      font-weight: 700;
-      letter-spacing: -0.07em;
-    }
-
-    .brand-mark {
-
-      width: 30px;
-      height: 30px;
-
-      display: grid;
-      place-items: center;
-
-      background: var(--text);
-      color: var(--bg);
-
-      border-radius: 9px;
-
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.08em;
-    }
-
-    .desktop-nav {
-
-      display: flex;
-      align-items: center;
-      gap: 32px;
-    }
-
-    .desktop-nav a {
-
-      color: var(--text-secondary);
-      font-size: 12px;
-      font-weight: 500;
-
-      transition: color var(--transition);
-    }
-
-    .desktop-nav a:hover {
-      color: var(--text);
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .theme-toggle {
-
-      width: 40px;
-      height: 40px;
-
-      display: grid;
-      place-items: center;
-
-      border: 1px solid var(--border);
-      background: var(--surface);
-
-      border-radius: 50%;
-      cursor: pointer;
-
-      transition:
-        background var(--transition),
-        border-color var(--transition),
-        transform var(--transition);
-    }
-
-    .theme-toggle:hover {
-      transform: rotate(12deg);
-      border-color: var(--border-strong);
-    }
-
-    .theme-toggle svg {
-
-      width: 17px;
-      height: 17px;
-
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-    }
-
-    .moon-icon {
-      display: none;
-    }
-
-    html[data-theme="dark"] .sun-icon {
-      display: none;
-    }
-
-    html[data-theme="dark"] .moon-icon {
-      display: block;
-    }
-
-    .nav-cta {
-
-      padding: 10px 15px;
-
-      background: var(--text);
-      color: var(--bg);
-
-      border-radius: 30px;
-
-      font-size: 11px;
-      font-weight: 600;
-
-      transition:
-        opacity var(--transition),
-        transform var(--transition);
-    }
-
-    .nav-cta:hover {
-      opacity: 0.8;
-      transform: translateY(-2px);
-    }
-
-    .nav-cta span {
-      margin-left: 6px;
-    }
-
-    .mobile-menu-toggle {
-      display: none;
-    }
-
-    .mobile-nav {
-      display: none;
-    }
-
-
-    /* Hero */
-
-    .hero {
-
-      min-height: 710px;
-      padding-top: 105px;
-      padding-bottom: 45px;
-
-      display: grid;
-      grid-template-columns: 1fr 0.9fr;
-
-      align-items: center;
-      gap: 65px;
-
-      position: relative;
-    }
-
-    .hero-content {
-      max-width: 570px;
-    }
-
-    .eyebrow {
-
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-
-      color: var(--text-secondary);
-
-      margin-bottom: 27px;
-    }
-
-    .status-dot,
-    .runtime-indicator,
-    .architecture-indicator {
-
-      width: 7px;
-      height: 7px;
-
-      display: inline-block;
-
-      background: var(--success);
-      border-radius: 50%;
-    }
-
-    .status-dot {
-      box-shadow: 0 0 0 4px color-mix(
-        in srgb,
-        var(--success) 12%,
-        transparent
-      );
-    }
-
-    .hero-title {
-
-      margin: 0;
-
-      font-size: clamp(42px, 5.3vw, 69px);
-      font-weight: 650;
-
-      letter-spacing: -0.075em;
-      line-height: 1.06;
-
-      max-width: 650px;
-    }
-
-    .hero-title span,
-    .section-heading h2 span,
-    .statement-inner blockquote span,
-    .cta-inner h2 span,
-    .scope-intro h2 span {
-
-      display: block;
-      color: var(--text-secondary);
-    }
-
-    .hero-description {
-
-      max-width: 460px;
-
-      margin-top: 27px;
-
-      color: var(--text-secondary);
-
-      font-size: 15px;
-      line-height: 1.9;
-    }
-
-    .hero-actions {
-
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-
-      gap: 12px;
-
-      margin-top: 35px;
-    }
-
-    .button {
-
-      min-height: 47px;
-      padding: 0 19px;
-
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-
-      border-radius: 30px;
-
-      font-size: 12px;
-      font-weight: 600;
-
-      transition:
-        transform var(--transition),
-        background var(--transition),
-        opacity var(--transition);
-    }
-
-    .button:hover {
-      transform: translateY(-3px);
-    }
-
-    .button-primary {
-
-      background: var(--text);
-      color: var(--bg);
-    }
-
-    .button-primary:hover {
-      opacity: 0.85;
-    }
-
-    .button-secondary {
-
-      border: 1px solid var(--border-strong);
-      background: transparent;
-      color: var(--text);
-    }
-
-    .button-secondary:hover {
-      background: var(--surface-soft);
-    }
-
-    .hero-meta {
-
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      margin-top: 46px;
-
-      color: var(--text-tertiary);
-
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .meta-divider {
-
-      width: 3px;
-      height: 3px;
-
-      background: var(--text-tertiary);
-      border-radius: 50%;
-    }
-
-
-    /* Hero visual */
-
-    .hero-visual {
-
-      padding: 23px;
-
-      border: 1px solid var(--border);
-      background: var(--surface);
-
-      border-radius: var(--radius-lg);
-
-      box-shadow: var(--shadow);
-
-      animation: visual-float 7s ease-in-out infinite;
-    }
-
-    .visual-topline,
-    .visual-bottomline {
-
-      display: flex;
-      justify-content: space-between;
-
-      color: var(--text-tertiary);
-      font-size: 9px;
-    }
-
-    .visual-topline {
-      padding-bottom: 22px;
-    }
-
-    .comparison-visual {
-
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-
-      align-items: center;
-      gap: 10px;
-    }
-
-    .runtime-column {
-
-      padding: 15px 12px;
-
-      background: var(--surface-soft);
-      border: 1px solid var(--border);
-
-      border-radius: 13px;
-    }
-
-    .runtime-heading {
-
-      display: flex;
-      align-items: center;
-      gap: 7px;
-
-      font-size: 8px;
-      font-weight: 500;
-    }
-
-    .runtime-indicator {
-      width: 5px;
-      height: 5px;
-    }
-
-    .runtime-output {
-
-      margin-top: 20px;
-
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-
-      font-family: var(--mono);
-      font-size: 12px;
-    }
-
-    .runtime-output span {
-
-      padding: 6px 8px;
-
-      background: var(--surface);
-      border: 1px solid var(--border);
-
-      border-radius: 5px;
-    }
-
-    .runtime-footer {
-
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      margin-top: 15px;
-
-      color: var(--text-tertiary);
-      font-size: 7px;
-    }
-
-    .runtime-state {
-      color: var(--success);
-    }
-
-    .comparison-center {
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-
-      color: var(--text-tertiary);
-
-      font-family: var(--mono);
-      font-size: 7px;
-    }
-
-    .comparison-symbol {
-      font-size: 22px;
-      color: var(--text);
-    }
-
-    .visual-bottomline {
-      margin-top: 20px;
-      font-size: 8px;
-    }
-
-    .hero-bottom {
-
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-
-      display: flex;
-      justify-content: space-between;
-
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
-
-      color: var(--text-tertiary);
-      font-size: 9px;
-    }
-
-
-    /* Section headings */
-
-    .section-heading {
-      max-width: 700px;
-      margin-bottom: 55px;
-    }
-
-    .section-index {
-      color: var(--text-tertiary);
-    }
-
-    .section-heading h2,
-    .scope-intro h2 {
-
-      margin: 18px 0 15px;
-
-      font-size: clamp(34px, 4vw, 51px);
-      font-weight: 600;
-
-      letter-spacing: -0.065em;
-      line-height: 1.12;
-    }
-
-    .section-heading > p,
-    .scope-intro > p {
-
-      max-width: 510px;
-
-      color: var(--text-secondary);
-
-      font-size: 14px;
-      line-height: 1.9;
-    }
-
-
-    /* Problem */
-
-    .section-problem {
-      background: var(--surface-soft);
-    }
-
-    .problem-grid {
-
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-
-      gap: 17px;
-    }
-
-    .problem-card {
-
-      min-height: 230px;
-      padding: 27px;
-
-      background: var(--surface);
-      border: 1px solid var(--border);
-
-      border-radius: var(--radius-md);
-
-      transition:
-        transform var(--transition),
-        border-color var(--transition);
-    }
-
-    .problem-card:hover {
-
-      transform: translateY(-5px);
-      border-color: var(--border-strong);
-    }
-
-    .card-number {
-      color: var(--text-tertiary);
-    }
-
-    .problem-card h3 {
-
-      margin: 30px 0 10px;
-
-      font-size: 18px;
-      letter-spacing: -0.04em;
-    }
-
-    .problem-card p {
-
-      margin: 0;
-
-      color: var(--text-secondary);
-
-      font-size: 12px;
-      line-height: 1.9;
-    }
-
-    .card-tag {
-
-      display: inline-block;
-      margin-top: 24px;
-
-      color: var(--text-tertiary);
-      font-size: 8px;
-    }
-
-
-    /* Statement */
-
-    .statement-section {
-
-      padding-block: 125px;
-
-      background: var(--text);
-      color: var(--bg);
-    }
-
-    .statement-inner {
-      max-width: 850px;
-    }
-
-    .statement-inner .section-index {
-      color: var(--text-tertiary);
-    }
-
-    .statement-inner blockquote {
-
-      margin: 32px 0;
-
-      font-size: clamp(34px, 5.5vw, 65px);
-      font-weight: 550;
-
-      letter-spacing: -0.075em;
-      line-height: 1.16;
-    }
-
-    .statement-inner blockquote span {
-      color: color-mix(in srgb, var(--bg) 55%, transparent);
-    }
-
-    .statement-inner p {
-
-      max-width: 480px;
-
-      color: color-mix(in srgb, var(--bg) 65%, transparent);
-
-      font-size: 13px;
-      line-height: 1.9;
-    }
-
-
-    /* Approach */
-
-    .approach-layout {
-
-      display: grid;
-      grid-template-columns: 1fr 0.95fr;
-
-      gap: 65px;
-      align-items: center;
-    }
-
-    .approach-list {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .approach-item {
-
-      display: grid;
-      grid-template-columns: 42px 1fr;
-
-      gap: 16px;
-
-      padding: 24px 0;
-
-      border-bottom: 1px solid var(--border);
-    }
-
-    .approach-number {
-
-      color: var(--text-tertiary);
-
-      font-family: var(--mono);
-      font-size: 11px;
-    }
-
-    .approach-item h3 {
-
-      margin: 0 0 8px;
-
-      font-size: 16px;
-      letter-spacing: -0.035em;
-    }
-
-    .approach-item p {
-
-      max-width: 390px;
-
-      margin: 0;
-
-      color: var(--text-secondary);
-
-      font-size: 12px;
-      line-height: 1.9;
-    }
-
-
-    /* Architecture */
-
-    .architecture-card {
-
-      padding: 24px;
-
-      background: var(--surface);
-      border: 1px solid var(--border);
-
-      border-radius: var(--radius-lg);
-
-      box-shadow: var(--shadow);
-    }
-
-    .architecture-header,
-    .architecture-footer {
-
-      display: flex;
-      justify-content: space-between;
-
-      color: var(--text-tertiary);
-      font-size: 8px;
-    }
-
-    .architecture-indicator {
-      width: 6px;
-      height: 6px;
-    }
-
-    .architecture-flow {
-      padding: 30px 0;
-    }
-
-    .flow-node {
-
-      min-height: 62px;
-      padding: 11px 13px;
-
-      display: flex;
-      align-items: center;
-      gap: 13px;
-
-      background: var(--surface-soft);
-      border: 1px solid var(--border);
-
-      border-radius: 10px;
-    }
-
-    .flow-icon {
-
-      width: 32px;
-      height: 32px;
-
-      display: grid;
-      place-items: center;
-
-      background: var(--text);
-      color: var(--bg);
-
-      border-radius: 8px;
-
-      font-family: var(--mono);
-      font-size: 10px;
-    }
-
-    .flow-node strong {
-
-      display: block;
-
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .flow-node small {
-
-      display: block;
-
-      margin-top: 3px;
-
-      color: var(--text-tertiary);
-
-      font-family: var(--mono);
-      font-size: 9px;
-    }
-
-    .flow-connector {
-
-      width: 1px;
-      height: 21px;
-
-      margin-inline: auto;
-
-      background: var(--border-strong);
-    }
-
-    .flow-split {
-
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-
-      gap: 9px;
-    }
-
-    .flow-split .flow-node {
-      padding: 10px 8px;
       gap: 8px;
     }
 
-    .flow-split .flow-icon {
-      width: 27px;
-      height: 27px;
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      flex-shrink: 0;
     }
 
-    .flow-split .flow-node strong {
-      font-size: 9px;
-    }
-
-    .flow-split .flow-node small {
-      font-size: 8px;
-    }
-
-    .flow-result {
-      border-color: var(--border-strong);
-    }
-
-    .architecture-footer {
-      padding-top: 15px;
-      border-top: 1px solid var(--border);
-    }
-
-
-    /* Workflow */
-
-    .section-workflow {
-      background: var(--surface-soft);
-    }
-
-    .workflow-grid {
-
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-
-      gap: 15px;
-    }
-
-    .workflow-card {
-
-      min-width: 0;
-      padding: 23px;
-
-      background: var(--surface);
-      border: 1px solid var(--border);
-
-      border-radius: var(--radius-md);
-    }
-
-    .workflow-card-top {
-
-      display: flex;
-      justify-content: space-between;
-
-      color: var(--text-tertiary);
-      font-size: 8px;
-    }
-
-    .workflow-card h3 {
-
-      margin: 27px 0 8px;
-
-      font-size: 17px;
-      letter-spacing: -0.04em;
-    }
-
-    .workflow-card > p {
-
-      min-height: 66px;
-
-      margin: 0;
-
-      color: var(--text-secondary);
-
-      font-size: 11px;
-      line-height: 1.9;
-    }
-
-    .code-window {
-
-      position: relative;
-
-      margin-top: 25px;
-
-      overflow: hidden;
-
-      background: var(--surface-soft);
-      border: 1px solid var(--border);
-
-      border-radius: 10px;
-    }
-
-    .code-header {
-
-      display: flex;
-      justify-content: space-between;
-
-      padding: 11px 13px;
-
-      color: var(--text-tertiary);
-
-      border-bottom: 1px solid var(--border);
-
-      font-size: 8px;
-    }
-
-    .code-window pre {
-
-      min-height: 65px;
-
-      overflow-x: auto;
-
-      margin: 0;
-      padding: 17px 13px 38px;
-
-      color: var(--text);
-
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--fg);
+      color: var(--bg);
       font-family: var(--mono);
-      font-size: 10px;
-      line-height: 1.8;
-
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
+      font-size: 14px;
+      font-weight: 500;
     }
 
-    .code-window code {
-      font-family: inherit;
+    .brand-sep {
+      color: var(--border-strong);
+      font-weight: 400;
+      user-select: none;
     }
 
-    .copy-button {
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
 
-      position: absolute;
-      bottom: 9px;
-      right: 10px;
+    .desktop-nav a {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fg);
+      transition: background var(--transition), color var(--transition);
+    }
 
-      padding: 5px 9px;
+    .desktop-nav a:hover { background: var(--muted); }
 
-      background: var(--surface);
-      border: 1px solid var(--border);
+    .nav-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-      border-radius: 5px;
-
-      color: var(--text-secondary);
-
-      font-family: var(--mono);
-      font-size: 8px;
-
-      cursor: pointer;
-
+    .star-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg);
       transition: background var(--transition);
     }
 
-    .copy-button:hover {
-      background: var(--border);
+    .star-badge:hover { background: var(--muted); }
+
+    .star-badge svg { width: 16px; height: 16px; }
+
+    .sponsor-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fg);
+      transition: background var(--transition);
     }
 
-    .workflow-note {
+    .sponsor-link:hover { background: var(--muted); }
+    .sponsor-link svg { width: 16px; height: 16px; color: var(--pink); }
 
-      display: flex;
-      align-items: flex-start;
-      gap: 13px;
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition);
+    }
 
-      margin-top: 25px;
-      padding: 17px 20px;
+    .theme-toggle:hover { background: var(--muted); }
 
-      background: var(--surface);
-      border: 1px solid var(--border);
+    .theme-toggle svg {
+      width: 16px;
+      height: 16px;
+      color: var(--fg);
+    }
 
+    html[data-theme="light"] .theme-toggle .sun-icon { display: none; }
+    html[data-theme="dark"] .theme-toggle .moon-icon { display: none; }
+
+    .mobile-menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
       border-radius: var(--radius-sm);
     }
 
-    .note-icon {
+    .mobile-menu-toggle:hover { background: var(--muted); }
+    .mobile-menu-toggle svg { width: 18px; height: 18px; color: var(--fg); }
 
-      width: 20px;
-      height: 20px;
-
-      display: grid;
-      place-items: center;
-
-      border: 1px solid var(--border-strong);
-      border-radius: 50%;
-
-      font-family: var(--mono);
-      font-size: 11px;
-    }
-
-    .workflow-note p {
-
-      margin: 0;
-
-      color: var(--text-secondary);
-
-      font-size: 11px;
-      line-height: 1.8;
-    }
-
-    .workflow-note strong {
-      color: var(--text);
-    }
-
-
-    /* Outcomes */
-
-    .outcome-grid {
-
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-
-      gap: 16px;
-    }
-
-    .outcome-card {
-
-      padding: 26px;
-
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-
-      background: var(--surface);
-
-      transition: transform var(--transition);
-    }
-
-    .outcome-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .outcome-symbol {
-
-      width: 35px;
-      height: 35px;
-
-      display: grid;
-      place-items: center;
-
-      background: var(--surface-soft);
-      border-radius: 9px;
-
-      font-size: 18px;
-    }
-
-    .outcome-card h3 {
-
-      margin: 25px 0 8px;
-
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.04em;
-    }
-
-    .outcome-card p {
-
-      min-height: 42px;
-
-      color: var(--text-secondary);
-      font-size: 12px;
-    }
-
-    .outcome-card > span {
-
-      color: var(--text-tertiary);
-
-      font-family: var(--mono);
-      font-size: 9px;
-      text-transform: uppercase;
-    }
-
-
-    /* Scope */
-
-    .section-scope {
-      background: var(--surface-soft);
-    }
-
-    .scope-layout {
-
-      display: grid;
-      grid-template-columns: 0.8fr 1.2fr;
-
-      align-items: start;
-      gap: 70px;
-    }
-
-    .scope-intro h2 {
-      font-size: clamp(33px, 4vw, 47px);
-    }
-
-    .text-link {
-
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-
-      margin-top: 25px;
-
-      font-size: 12px;
-      font-weight: 600;
-
-      border-bottom: 1px solid var(--border-strong);
-
-      padding-bottom: 5px;
-
-      transition: gap var(--transition);
-    }
-
-    .text-link:hover {
-      gap: 16px;
-    }
-
-    .scope-table {
-
-      padding: 7px 20px;
-
-      background: var(--surface);
-      border: 1px solid var(--border);
-
-      border-radius: var(--radius-md);
-    }
-
-    .scope-row {
-
-      min-height: 59px;
-
+    .mobile-nav {
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      right: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 24px 16px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
+      flex-direction: column;
+    }
 
+    .mobile-nav[hidden] { display: none; }
+
+    .mobile-nav a {
+      padding: 10px 4px;
+      font-size: 14px;
+      font-weight: 500;
       border-bottom: 1px solid var(--border);
     }
 
-    .scope-row:last-child {
-      border-bottom: 0;
+    .mobile-nav a:last-child { border-bottom: 0; }
+
+    /* -----------------------------------------
+       Hero
+       ----------------------------------------- */
+
+    .hero {
+      padding-top: 88px;
+      padding-bottom: 64px;
     }
 
-    .scope-row > span:first-child {
+    .hero-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      text-align: center;
+    }
 
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg);
+      background: var(--bg);
+      transition: background var(--transition);
+    }
+
+    .hero-badge:hover { background: var(--muted); }
+    .hero-badge .badge-arrow { color: var(--muted-fg); }
+
+    .hero-title {
+      margin: 0;
+      max-width: 20ch;
+      font-size: clamp(40px, 7vw, 60px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      background: linear-gradient(to bottom, var(--fg) 50%, color-mix(in oklab, var(--fg) 65%, transparent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-wrap: balance;
+    }
+
+    .hero-description {
+      margin: 0;
+      max-width: var(--hero-text);
+      font-size: 20px;
+      line-height: 28px;
+      color: var(--muted-fg);
+      text-wrap: balance;
+    }
+
+    /* Install box */
+
+    .install-box {
+      width: min(576px, 100%);
+      border-radius: var(--radius-sm);
+      background: var(--code-bg);
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .install-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      border-bottom: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
+    }
+
+    .pkg-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--muted-fg);
+      flex-shrink: 0;
+    }
+
+    .pkg-tab-group {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      min-width: 0;
+      overflow-x: auto;
+    }
+
+    .pkg-tab {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 8px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      color: var(--fg);
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .pkg-tab:hover { background: color-mix(in oklab, var(--border) 40%, transparent); }
+
+    .pkg-tab[aria-selected="true"] {
+      background: var(--bg);
+      border-color: var(--border);
+    }
+
+    .install-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .install-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      transition: background var(--transition);
+    }
+
+    .install-action:hover { background: color-mix(in oklab, var(--border) 40%, transparent); }
+
+    .install-action svg { width: 16px; height: 16px; color: var(--muted-fg); }
+
+    .install-action-labeled {
+      width: auto;
+      gap: 4px;
+      padding: 0 8px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .install-action-labeled svg { width: 14px; height: 14px; }
+
+    .install-action .check-icon { display: none; }
+    .install-action.copied .copy-icon { display: none; }
+    .install-action.copied .check-icon { display: block; color: var(--success); }
+
+    /* Copy outcome is never signalled by colour alone: a live region
+       carries the same information for assistive technology. */
+    .install-action.error .copy-icon { color: var(--danger); }
+
+    .install-command {
+      display: block;
+      padding: 14px 16px;
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--muted-fg);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .install-command .dollar { color: var(--muted-fg); user-select: none; }
+    .install-command .cmd-dim { color: var(--muted-fg); }
+    .install-command .cmd-pkg { color: var(--muted-fg); }
+
+    /* Hero actions */
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 16px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background var(--transition), border-color var(--transition), opacity var(--transition);
+    }
+
+    .button-primary {
+      background: var(--accent-fg);
+      color: var(--accent-contrast);
+    }
+
+    .button-primary:hover { opacity: 0.88; }
+
+    .button-secondary {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .button-secondary:hover { background: var(--muted); }
+
+    .agent-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted-fg);
+      transition: color var(--transition), background var(--transition);
+    }
+
+    .agent-copy:hover { color: var(--fg); background: var(--muted); }
+    .agent-copy svg { width: 12px; height: 12px; }
+
+    /* -----------------------------------------
+       Showcase grid
+       ----------------------------------------- */
+
+    .showcase {
+      padding-bottom: 80px;
+    }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .showcase-card {
+      position: relative;
+      min-height: 300px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--dark-card-border);
+      background:
+        radial-gradient(120% 90% at 50% 0%, rgba(124, 58, 237, 0.14), transparent 60%),
+        var(--dark-card);
+      color: var(--dark-card-fg);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .showcase-card .card-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+      align-self: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dark-card-muted);
+    }
+
+    .showcase-card .card-chip::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: var(--pink);
+    }
+
+    .showcase-card .card-tag {
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--dark-card-muted);
+      margin-bottom: 16px;
+    }
+
+    .showcase-card .card-tag::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--pink);
+    }
+
+    .showcase-card h2 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      text-align: center;
+      text-wrap: balance;
+    }
+
+    .showcase-card p {
+      margin: 12px 0 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--dark-card-muted);
+      text-align: center;
+      max-width: 46ch;
+      margin-inline: auto;
+    }
+
+    /* Quote card */
+
+    .card-quote-mark {
+      font-family: var(--mono);
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--pink);
+      margin-bottom: 12px;
+    }
+
+    .card-quote h2 { text-align: left; }
+    .card-quote .quote-attribution {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .quote-avatar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dark-card-muted);
+    }
+
+    .quote-name { font-size: 13px; font-weight: 600; }
+    .quote-sub { font-size: 12px; color: var(--dark-card-muted); }
+
+    /* Command card */
+
+    .card-command h2 { text-align: left; }
+
+    .card-command .command-line {
+      margin-top: 20px;
+      padding: 12px 14px;
+      border: 1px solid var(--dark-card-border);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 20px;
+      color: var(--dark-card-fg);
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .card-command .command-line .dollar { color: var(--dark-card-muted); user-select: none; }
+
+    .card-command .card-chip { align-self: flex-end; margin-top: auto; }
+
+    /* Report mockup card */
+
+    .card-report { padding: 24px; }
+
+    .card-report h2 { font-size: 24px; }
+
+    .report-mock {
+      margin-top: 20px;
+      border: 1px solid var(--dark-card-border);
+      border-radius: var(--radius-md);
+      background: #050505;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dark-card-muted);
+    }
+
+    .report-mock .report-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--dark-card-border);
+    }
+
+    .report-mock .report-title { color: var(--dark-card-fg); }
+
+    .report-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
       font-size: 11px;
       font-weight: 500;
     }
 
-    .scope-status {
-
-      flex-shrink: 0;
-
-      font-family: var(--mono);
-      font-size: 8px;
-      letter-spacing: 0.03em;
+    .report-status::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
     }
 
-    .scope-status.implemented {
-      color: var(--success);
+    .report-status.pass { color: var(--success); background: rgba(22, 163, 74, 0.12); }
+    .report-status.difference { color: var(--danger); background: rgba(220, 38, 38, 0.12); }
+
+    .report-mock .report-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 10px;
     }
 
-    .scope-status.blocked {
-      color: var(--warning);
+    .report-mock .report-row strong { color: var(--dark-card-fg); font-weight: 500; }
+
+    .report-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 64px;
+      margin-top: 14px;
     }
 
-    .scope-status.planned {
-      color: var(--muted-status);
+    .report-bars span {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: rgba(255, 255, 255, 0.14);
     }
 
+    .report-bars span.mismatch { background: var(--pink); }
 
-    /* CTA */
-
-    .cta-section {
-
-      padding-block: 115px;
-
-      background: var(--text);
-      color: var(--bg);
+    .report-note {
+      margin-top: 12px;
+      font-family: var(--font);
+      font-size: 11px;
+      color: var(--dark-card-muted);
+      display: flex;
+      justify-content: space-between;
     }
 
-    .cta-inner {
-      text-align: center;
-    }
-
-    .cta-inner .section-index {
-      color: var(--text-tertiary);
-    }
-
-    .cta-inner h2 {
-
-      margin: 25px 0 18px;
-
-      font-size: clamp(45px, 7vw, 80px);
-      font-weight: 600;
-
-      letter-spacing: -0.08em;
-      line-height: 1.08;
-    }
-
-    .cta-inner h2 span {
-      color: color-mix(in srgb, var(--bg) 55%, transparent);
-    }
-
-    .cta-inner > p {
-
-      max-width: 470px;
-
-      margin: 0 auto;
-
-      color: color-mix(in srgb, var(--bg) 65%, transparent);
-
-      font-size: 13px;
-      line-height: 1.9;
-    }
-
-    .button-cta {
-
-      margin-top: 32px;
-
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .button-cta:hover {
-      opacity: 0.85;
-    }
-
-    .cta-caption {
-
-      display: block;
-
-      margin-top: 27px;
-
-      color: var(--text-tertiary);
-      font-size: 8px;
-    }
-
-
-    /* Footer */
+    /* -----------------------------------------
+       Footer
+       ----------------------------------------- */
 
     .site-footer {
-      padding-top: 65px;
-    }
-
-    .footer-main {
-
-      display: flex;
-      justify-content: space-between;
-
-      gap: 40px;
-
-      padding-bottom: 55px;
-    }
-
-    .footer-brand {
-      max-width: 260px;
-    }
-
-    .footer-brand p {
-
-      margin-top: 18px;
-
-      color: var(--text-secondary);
-
-      font-size: 11px;
-      line-height: 1.8;
-    }
-
-    .footer-links {
-
-      display: flex;
-      gap: 85px;
-    }
-
-    .footer-links > div {
-
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .footer-label {
-
-      margin-bottom: 7px;
-
-      color: var(--text-tertiary);
-      font-size: 9px;
-    }
-
-    .footer-links a {
-
-      color: var(--text-secondary);
-      font-size: 11px;
-
-      transition: color var(--transition);
-    }
-
-    .footer-links a:hover {
-      color: var(--text);
-    }
-
-    .footer-bottom {
-
-      min-height: 65px;
-
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      gap: 15px;
-
       border-top: 1px solid var(--border);
-
-      color: var(--text-tertiary);
-
-      font-family: var(--mono);
-      font-size: 9px;
+      padding: 32px 0;
     }
 
-    .footer-bottom a {
-      color: var(--text-secondary);
+    .footer-line {
+      margin: 0;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted-fg);
     }
 
-
-    /* Toast */
-
-    .toast {
-
-      position: fixed;
-      bottom: 25px;
-      left: 50%;
-
-      z-index: 200;
-
-      padding: 11px 17px;
-
-      background: var(--text);
-      color: var(--bg);
-
-      border-radius: 30px;
-
-      font-size: 11px;
-
-      opacity: 0;
-      pointer-events: none;
-
-      transform: translate(-50%, 15px);
-
-      transition:
-        opacity var(--transition),
-        transform var(--transition);
+    .footer-line a {
+      color: var(--fg);
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 4px;
     }
 
-    .toast.visible {
-
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-
-
-    /* Scroll reveal */
-
-    .reveal {
-
-      opacity: 0;
-
-      transform: translateY(18px);
-
-      transition:
-        opacity 650ms ease,
-        transform 650ms cubic-bezier(.2, .7, .2, 1);
-    }
-
-    .reveal.is-visible {
-
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-
-    /* Motion */
-
-    @keyframes visual-float {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-7px);
-      }
-    }
-
-
-    /* Responsive: tablet */
+    /* -----------------------------------------
+       Responsive
+       ----------------------------------------- */
 
     @media (max-width: 900px) {
-
-      .hero {
-
-        grid-template-columns: 1fr;
-
-        gap: 55px;
-
-        padding-top: 80px;
-        padding-bottom: 85px;
-      }
-
-      .hero-content {
-        max-width: 700px;
-      }
-
-      .hero-visual {
-        max-width: 600px;
-        width: 100%;
-        margin-inline: auto;
-      }
-
-      .hero-bottom {
-        bottom: 0;
-      }
-
-      .approach-layout {
-        grid-template-columns: 1fr;
-        gap: 45px;
-      }
-
-      .architecture-card {
-        max-width: 600px;
-      }
-
-      .scope-layout {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-
-      .workflow-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .workflow-card:last-child {
-        grid-column: span 2;
-      }
-
+      .showcase-grid { grid-template-columns: 1fr; }
+      .showcase-card { min-height: 260px; }
     }
 
-
-    /* Responsive: mobile */
-
-    @media (max-width: 650px) {
-
-      :root {
-        --header-height: 66px;
-      }
-
-      .section-shell,
-      .nav-shell {
-        width: min(calc(100% - 36px), var(--container));
-      }
-
-      .section {
-        padding-block: 80px;
-      }
-
-      .desktop-nav,
-      .nav-cta {
-        display: none;
-      }
-
-      .nav-actions {
-        gap: 10px;
-      }
-
-      .theme-toggle {
-        width: 37px;
-        height: 37px;
-      }
-
-      .mobile-menu-toggle {
-
-        width: 39px;
-        height: 39px;
-
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
-
-        background: transparent;
-        border: 1px solid var(--border);
-
-        border-radius: 50%;
-
-        cursor: pointer;
-      }
-
-      .mobile-menu-toggle span {
-
-        width: 14px;
-        height: 1.5px;
-
-        background: var(--text);
-
-        transition:
-          transform var(--transition),
-          opacity var(--transition);
-      }
-
-      .mobile-menu-toggle[aria-expanded="true"] span:first-child {
-        transform: translateY(3.25px) rotate(45deg);
-      }
-
-      .mobile-menu-toggle[aria-expanded="true"] span:last-child {
-        transform: translateY(-3.25px) rotate(-45deg);
-      }
-
-      .mobile-nav {
-
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-
-        padding: 14px 20px 22px;
-
-        background: var(--bg);
-        border-bottom: 1px solid var(--border);
-
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-      }
-
-      .mobile-nav[hidden] {
-        display: none;
-      }
-
-      .mobile-nav a {
-
-        padding: 13px 4px;
-
-        color: var(--text-secondary);
-
-        font-size: 13px;
-
-        border-bottom: 1px solid var(--border);
-      }
-
-      .mobile-nav a:last-child {
-        border-bottom: 0;
-      }
-
-      .hero {
-
-        min-height: auto;
-
-        padding-top: 75px;
-        padding-bottom: 80px;
-
-        gap: 45px;
-      }
-
-      .hero-title {
-        font-size: clamp(42px, 12vw, 59px);
-      }
-
-      .hero-description {
-        font-size: 13px;
-      }
-
-      .hero-meta {
-        flex-wrap: wrap;
-        font-size: 8px;
-        gap: 9px;
-      }
-
-      .hero-visual {
-        padding: 16px;
-      }
-
-      .runtime-column {
-        padding: 11px 8px;
-      }
-
-      .runtime-heading {
-        font-size: 7px;
-      }
-
-      .comparison-visual {
-        gap: 5px;
-      }
-
-      .hero-bottom {
-        font-size: 7px;
-      }
-
-      .section-heading {
-        margin-bottom: 35px;
-      }
-
-      .section-heading h2,
-      .scope-intro h2 {
-        font-size: 37px;
-      }
-
-      .problem-grid,
-      .outcome-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .problem-card {
-        min-height: auto;
-      }
-
-      .problem-card h3 {
-        margin-top: 20px;
-      }
-
-      .statement-section {
-        padding-block: 85px;
-      }
-
-      .statement-inner blockquote {
-        font-size: 39px;
-      }
-
-      .approach-layout {
-        gap: 35px;
-      }
-
-      .architecture-card {
-        padding: 17px;
-      }
-
-      .workflow-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .workflow-card:last-child {
-        grid-column: auto;
-      }
-
-      .workflow-card > p {
-        min-height: auto;
-      }
-
-      .scope-table {
-        padding-inline: 13px;
-      }
-
-      .scope-row {
-        min-height: 66px;
-      }
-
-      .scope-row > span:first-child {
-        font-size: 10px;
-      }
-
-      .scope-status {
-        font-size: 7px;
-      }
-
-      .cta-section {
-        padding-block: 85px;
-      }
-
-      .cta-inner h2 {
-        font-size: 54px;
-      }
-
-      .footer-main {
-        flex-direction: column;
-        gap: 35px;
-      }
-
-      .footer-links {
-        gap: 55px;
-      }
-
-      .footer-bottom {
-
-        padding-block: 20px;
-
-        align-items: flex-start;
-        flex-direction: column;
-
-        gap: 11px;
-      }
-
+    @media (max-width: 767px) {
+      .desktop-nav { display: none; }
+      .mobile-menu-toggle { display: inline-flex; }
+
+      .hero { padding-top: 56px; padding-bottom: 48px; }
+      .hero-title { font-size: clamp(34px, 9vw, 44px); }
+      .hero-description { font-size: 17px; line-height: 26px; }
+
+      .install-actions .install-action span { display: none; }
+
+      .showcase { padding-bottom: 56px; }
+      .showcase-card { padding: 24px; }
+      .showcase-card h2 { font-size: 24px; }
     }
-
-
-    /* Reduced motion accessibility */
 
     @media (prefers-reduced-motion: reduce) {
-
-      *,
-      *::before,
-      *::after {
-
-        scroll-behavior: auto !important;
-
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-
-        transition-duration: 0.01ms !important;
-      }
-
-      .reveal {
-        opacity: 1;
-        transform: none;
-      }
-
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
     }
   </style>
 </head>
 
 <body>
 
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="visually-hidden" href="#main">Skip to content</a>
 
-  <!-- Header -->
   <header class="site-header" id="top">
 
-    <div class="nav-shell">
+    <div class="container nav-shell">
 
       <a class="brand" href="#top" aria-label="Materna home">
         <span class="brand-mark" aria-hidden="true">M.</span>
         <span>materna</span>
       </a>
 
-      <nav class="desktop-nav" aria-label="Main navigation">
-        <a href="#problem">The problem</a>
-        <a href="#approach">Approach</a>
-        <a href="#workflow">Workflow</a>
-        <a href="#scope">Scope</a>
+      <nav class="desktop-nav" aria-label="Main">
+        <a href="https://github.com/shaonkabir8/materna#readme">Docs</a>
+        <a href="https://github.com/shaonkabir8/materna#-quick-start">Quick start</a>
+        <a href="https://github.com/shaonkabir8/materna#-api-reference">API</a>
+        <a href="https://github.com/shaonkabir8/materna#-limitations--compatibility">Compatibility</a>
       </nav>
 
       <div class="nav-actions">
+
+        <a
+          class="star-badge"
+          href="https://github.com/shaonkabir8/materna"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Materna on GitHub"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+          <span aria-hidden="true">★</span>
+        </a>
+
+        <a
+          class="sponsor-link"
+          href="https://github.com/sponsors/shaonkabir8"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          </svg>
+          Sponsor
+        </a>
 
         <button
           class="theme-toggle"
@@ -1969,25 +876,15 @@
           aria-label="Switch to dark mode"
           title="Toggle appearance"
         >
-          <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
           </svg>
 
-          <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M20.2 15.1A8.5 8.5 0 0 1 8.9 3.8 8.6 8.6 0 1 0 20.2 15.1Z"></path>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
           </svg>
         </button>
-
-        <a
-          class="nav-cta"
-          href="https://github.com/shaonkabir8/materna"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Explore GitHub
-          <span aria-hidden="true">↗</span>
-        </a>
 
         <button
           class="mobile-menu-toggle"
@@ -1997,27 +894,21 @@
           aria-controls="mobileNav"
           aria-label="Open navigation"
         >
-          <span></span>
-          <span></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
         </button>
 
       </div>
 
     </div>
 
-    <nav
-      class="mobile-nav"
-      id="mobileNav"
-      aria-label="Mobile navigation"
-      hidden
-    >
-      <a href="#problem">The problem</a>
-      <a href="#approach">Approach</a>
-      <a href="#workflow">Workflow</a>
-      <a href="#scope">Scope</a>
-      <a href="https://github.com/shaonkabir8/materna">
-        Explore GitHub ↗
-      </a>
+    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation" hidden>
+      <a href="https://github.com/shaonkabir8/materna#readme">Docs</a>
+      <a href="https://github.com/shaonkabir8/materna#-quick-start">Quick start</a>
+      <a href="https://github.com/shaonkabir8/materna#-api-reference">API</a>
+      <a href="https://github.com/shaonkabir8/materna#-limitations--compatibility">Compatibility</a>
+      <a href="https://github.com/sponsors/shaonkabir8">Sponsor</a>
     </nav>
 
   </header>
@@ -2026,706 +917,198 @@
   <main id="main">
 
     <!-- Hero -->
-    <section class="hero section-shell">
+    <section class="hero">
 
-      <div class="hero-content">
+      <div class="container hero-inner">
 
-        <div class="eyebrow reveal">
-          <span class="status-dot"></span>
-          Behavioral compatibility testing
-        </div>
-
-        <h1 class="hero-title reveal">
-          Versions are metadata.
-          <span>Behavior is evidence.</span>
-        </h1>
-
-        <p class="hero-description reveal">
-          Different environments can produce different results
-          from the same input.
-
-          Materna provides a foundation for observing, fingerprinting
-          and comparing that behavior.
-        </p>
-
-        <div class="hero-actions reveal">
-
-          <a class="button button-primary" href="#approach">
-            Discover the approach
-            <span aria-hidden="true">↓</span>
-          </a>
-
-          <a
-            class="button button-secondary"
-            href="https://github.com/shaonkabir8/materna"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View source
-            <span aria-hidden="true">↗</span>
-          </a>
-
-        </div>
-
-        <div class="hero-meta reveal">
-          <span>Node.js</span>
-          <span class="meta-divider"></span>
-          <span>PostgreSQL</span>
-          <span class="meta-divider"></span>
-          <span>Observed behavior</span>
-        </div>
-
-      </div>
-
-      <div class="hero-visual reveal" aria-label="Illustration of behavioral comparison">
-
-        <div class="visual-topline">
-          <span>OBSERVATION / 001</span>
-          <span class="mono-label">COLLATION</span>
-        </div>
-
-        <div class="comparison-visual">
-
-          <div class="runtime-column">
-
-            <div class="runtime-heading">
-              <span class="runtime-indicator"></span>
-              NODE.JS
-            </div>
-
-            <div class="runtime-output">
-              <span>a</span>
-              <span>ä</span>
-              <span>å</span>
-              <span>z</span>
-            </div>
-
-            <div class="runtime-footer">
-              <span>Observed result</span>
-              <span class="runtime-state">READY</span>
-            </div>
-
-          </div>
-
-          <div class="comparison-center">
-            <span class="comparison-symbol">↔</span>
-            <span>COMPARE</span>
-          </div>
-
-          <div class="runtime-column">
-
-            <div class="runtime-heading">
-              <span class="runtime-indicator"></span>
-              POSTGRESQL
-            </div>
-
-            <div class="runtime-output">
-              <span>a</span>
-              <span>å</span>
-              <span>ä</span>
-              <span>z</span>
-            </div>
-
-            <div class="runtime-footer">
-              <span>Observed result</span>
-              <span class="runtime-state">READY</span>
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="visual-bottomline">
-          <span>Same input. Different observations.</span>
-          <span class="mono-label">ILLUSTRATIVE</span>
-        </div>
-
-      </div>
-
-      <div class="hero-bottom reveal">
-        <span>01 / INTRODUCTION</span>
-        <span>SCROLL TO EXPLORE ↓</span>
-      </div>
-
-    </section>
-
-
-    <!-- Problem -->
-    <section class="section section-problem" id="problem">
-
-      <div class="section-shell">
-
-        <div class="section-heading reveal">
-          <span class="section-index">01 — THE PROBLEM</span>
-
-          <h2>
-            Same input.
-            <span>Different behavior.</span>
-          </h2>
-
-          <p>
-            A successful execution does not guarantee equivalent
-            behavior across environments.
-          </p>
-        </div>
-
-        <div class="problem-grid">
-
-          <article class="problem-card reveal">
-
-            <span class="card-number">01</span>
-
-            <h3>Runtime differences</h3>
-
-            <p>
-              Runtime versions and internationalization data can
-              influence how applications interpret and sort text.
-            </p>
-
-            <span class="card-tag">NODE.JS</span>
-
-          </article>
-
-          <article class="problem-card reveal">
-
-            <span class="card-number">02</span>
-
-            <h3>Database differences</h3>
-
-            <p>
-              Database collation settings and providers can produce
-              ordering behavior that differs from application code.
-            </p>
-
-            <span class="card-tag">POSTGRESQL</span>
-
-          </article>
-
-          <article class="problem-card reveal">
-
-            <span class="card-number">03</span>
-
-            <h3>Invisible inconsistencies</h3>
-
-            <p>
-              Version information alone cannot establish whether
-              two systems actually produce equivalent results.
-            </p>
-
-            <span class="card-tag">OBSERVED BEHAVIOR</span>
-
-          </article>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- Philosophy -->
-    <section class="statement-section">
-
-      <div class="section-shell statement-inner reveal">
-
-        <span class="section-index">THE PRINCIPLE</span>
-
-        <blockquote>
-          “Versions are metadata.
-          <span>Observed behavior is evidence.”</span>
-        </blockquote>
-
-        <p>
-          Materna focuses on what systems actually produce,
-          not merely what their version information suggests.
-        </p>
-
-      </div>
-
-    </section>
-
-
-    <!-- Approach -->
-    <section class="section" id="approach">
-
-      <div class="section-shell">
-
-        <div class="section-heading reveal">
-
-          <span class="section-index">02 — THE APPROACH</span>
-
-          <h2>
-            Observe first.
-            <span>Compare with evidence.</span>
-          </h2>
-
-          <p>
-            Materna establishes a repeatable structure for
-            collecting and comparing behavioral observations.
-          </p>
-
-        </div>
-
-        <div class="approach-layout">
-
-          <div class="approach-list">
-
-            <article class="approach-item reveal">
-
-              <span class="approach-number">01</span>
-
-              <div>
-                <h3>Shared test contract</h3>
-                <p>
-                  Use a defined probe and an immutable corpus
-                  so observations have a consistent foundation.
-                </p>
-              </div>
-
-            </article>
-
-            <article class="approach-item reveal">
-
-              <span class="approach-number">02</span>
-
-              <div>
-                <h3>Environment observations</h3>
-                <p>
-                  Collect runtime and environment metadata
-                  alongside actual results.
-                </p>
-              </div>
-
-            </article>
-
-            <article class="approach-item reveal">
-
-              <span class="approach-number">03</span>
-
-              <div>
-                <h3>Deterministic fingerprints</h3>
-                <p>
-                  Generate SHA-256 hashes from serialized
-                  observed results.
-                </p>
-              </div>
-
-            </article>
-
-            <article class="approach-item reveal">
-
-              <span class="approach-number">04</span>
-
-              <div>
-                <h3>Explicit comparison</h3>
-                <p>
-                  Distinguish matching observations, behavioral
-                  differences and insufficient evidence.
-                </p>
-              </div>
-
-            </article>
-
-          </div>
-
-
-          <div class="architecture-card reveal">
-
-            <div class="architecture-header">
-              <span>OBSERVATION PIPELINE</span>
-              <span class="architecture-indicator"></span>
-            </div>
-
-            <div class="architecture-flow">
-
-              <div class="flow-node">
-                <span class="flow-icon">01</span>
-                <div>
-                  <strong>Shared corpus</strong>
-                  <small>collation-core-v1</small>
-                </div>
-              </div>
-
-              <div class="flow-connector"></div>
-
-              <div class="flow-split">
-
-                <div class="flow-node">
-                  <span class="flow-icon">N</span>
-                  <div>
-                    <strong>Node.js</strong>
-                    <small>Observation</small>
-                  </div>
-                </div>
-
-                <div class="flow-node">
-                  <span class="flow-icon">P</span>
-                  <div>
-                    <strong>PostgreSQL</strong>
-                    <small>Observation</small>
-                  </div>
-                </div>
-
-              </div>
-
-              <div class="flow-connector"></div>
-
-              <div class="flow-node">
-                <span class="flow-icon">02</span>
-                <div>
-                  <strong>Result fingerprint</strong>
-                  <small>SHA-256</small>
-                </div>
-              </div>
-
-              <div class="flow-connector"></div>
-
-              <div class="flow-node flow-result">
-                <span class="flow-icon">03</span>
-                <div>
-                  <strong>Comparison</strong>
-                  <small>PASS / DIFFERENCE / INCONCLUSIVE</small>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="architecture-footer">
-              <span>BEHAVIORAL OBSERVATION</span>
-              <span>FOUNDATION V0.1</span>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- Workflow -->
-    <section class="section section-workflow" id="workflow">
-
-      <div class="section-shell">
-
-        <div class="section-heading reveal">
-
-          <span class="section-index">03 — DEVELOPER WORKFLOW</span>
-
-          <h2>
-            A small foundation.
-            <span>A clear purpose.</span>
-          </h2>
-
-          <p>
-            The current implementation provides a Node.js probe,
-            a PostgreSQL adapter and a programmatic comparison API.
-          </p>
-
-        </div>
-
-        <div class="workflow-grid">
-
-          <article class="workflow-card reveal">
-
-            <div class="workflow-card-top">
-              <span>STEP 01</span>
-              <span>NODE.JS</span>
-            </div>
-
-            <h3>Collect an observation</h3>
-
-            <p>
-              Run the existing Node.js collation probe.
-            </p>
-
-            <div class="code-window">
-
-              <div class="code-header">
-                <span>TERMINAL</span>
-                <span>01</span>
-              </div>
-
-              <pre><code>npm run probe:node</code></pre>
-
-              <button class="copy-button" data-copy="npm run probe:node">
-                Copy
-              </button>
-
-            </div>
-
-          </article>
-
-
-          <article class="workflow-card reveal">
-
-            <div class="workflow-card-top">
-              <span>STEP 02</span>
-              <span>POSTGRESQL</span>
-            </div>
-
-            <h3>Collect another observation</h3>
-
-            <p>
-              Run the PostgreSQL adapter when a database
-              and required dependencies are available.
-            </p>
-
-            <div class="code-window">
-
-              <div class="code-header">
-                <span>TERMINAL</span>
-                <span>02</span>
-              </div>
-
-              <pre><code>npm run probe:postgres</code></pre>
-
-              <button class="copy-button" data-copy="npm run probe:postgres">
-                Copy
-              </button>
-
-            </div>
-
-          </article>
-
-
-          <article class="workflow-card reveal">
-
-            <div class="workflow-card-top">
-              <span>STEP 03</span>
-              <span>PROGRAMMATIC API</span>
-            </div>
-
-            <h3>Compare observations</h3>
-
-            <p>
-              Use the existing comparison API with two
-              previously collected observations.
-            </p>
-
-            <div class="code-window">
-
-              <div class="code-header">
-                <span>JAVASCRIPT</span>
-                <span>03</span>
-              </div>
-
-              <pre><code>import {
-  compareObservations
-} from "materna";
-
-const result = compareObservations(
-  nodeObservation,
-  postgresObservation
-);
-
-console.log(result.status);</code></pre>
-
-              <button
-                class="copy-button"
-                data-copy='import { compareObservations } from "materna";
-
-const result = compareObservations(
-  nodeObservation,
-  postgresObservation
-);
-
-console.log(result.status);'
-              >
-                Copy
-              </button>
-
-            </div>
-
-          </article>
-
-        </div>
-
-        <div class="workflow-note reveal">
-
-          <span class="note-icon">i</span>
-
-          <p>
-            <strong>Implementation note:</strong> The CLI does execute this workflow: <code>node src/cli.js compare --left node.json --right pg.json</code>. The API above is the same comparison, callable from your own code. Exit codes: 0 PASS, 1 DIFFERENCE, 2 INCONCLUSIVE, 3 ERROR.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- Outcomes -->
-    <section class="section section-outcomes">
-
-      <div class="section-shell">
-
-        <div class="section-heading reveal">
-
-          <span class="section-index">04 — EVIDENCE</span>
-
-          <h2>
-            Three possible outcomes.
-            <span>No false certainty.</span>
-          </h2>
-
-        </div>
-
-        <div class="outcome-grid">
-
-          <article class="outcome-card reveal">
-            <div class="outcome-symbol">✓</div>
-            <h3>PASS</h3>
-            <p>
-              The observed result hashes match.
-            </p>
-            <span>Matching evidence</span>
-          </article>
-
-          <article class="outcome-card reveal">
-            <div class="outcome-symbol">≠</div>
-            <h3>DIFFERENCE</h3>
-            <p>
-              The observed result hashes differ.
-            </p>
-            <span>Behavioral divergence</span>
-          </article>
-
-          <article class="outcome-card reveal">
-            <div class="outcome-symbol">?</div>
-            <h3>INCONCLUSIVE</h3>
-            <p>
-              Required observed results are missing.
-            </p>
-            <span>Insufficient evidence</span>
-          </article>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- Scope -->
-    <section class="section section-scope" id="scope">
-
-      <div class="section-shell scope-layout">
-
-        <div class="scope-intro reveal">
-
-          <span class="section-index">05 — CURRENT SCOPE</span>
-
-          <h2>
-            Built on evidence.
-            <span>Honest about limits.</span>
-          </h2>
-
-          <p>
-            Materna is an early engineering foundation.
-            Its current capabilities should not be confused
-            with a production-ready compatibility platform.
-          </p>
-
-          <a
-            class="text-link"
-            href="https://github.com/shaonkabir8/materna"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Inspect the source
-            <span aria-hidden="true">↗</span>
-          </a>
-
-        </div>
-
-
-        <div class="scope-table reveal">
-
-          <div class="scope-row">
-            <span>Node.js collation probe</span>
-            <span class="scope-status implemented">IMPLEMENTED</span>
-          </div>
-
-          <div class="scope-row">
-            <span>PostgreSQL adapter</span>
-            <span class="scope-status implemented">IMPLEMENTED</span>
-          </div>
-
-          <div class="scope-row">
-            <span>Deterministic hashing</span>
-            <span class="scope-status implemented">IMPLEMENTED</span>
-          </div>
-
-          <div class="scope-row">
-            <span>Observation comparison API</span>
-            <span class="scope-status implemented">IMPLEMENTED</span>
-          </div>
-
-          <div class="scope-row">
-            <span>Live PostgreSQL verification</span>
-            <span class="scope-status implemented">VERIFIED · LOCAL PG 16</span>
-          </div>
-
-          <div class="scope-row">
-            <span>Complete comparison CLI</span>
-            <span class="scope-status implemented">IMPLEMENTED</span>
-          </div>
-
-          <div class="scope-row">
-            <span>HTML report from a comparison</span>
-            <span class="scope-status implemented">IMPLEMENTED</span>
-          </div>
-
-          <div class="scope-row">
-            <span>CI/CD integration</span>
-            <span class="scope-status planned">DEFINED · UNEXECUTED</span>
-          </div>
-
-          <div class="scope-row">
-            <span>Additional behavioral probes</span>
-            <span class="scope-status planned">NOT ESTABLISHED</span>
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- CTA -->
-    <section class="cta-section">
-
-      <div class="section-shell cta-inner reveal">
-
-        <span class="section-index">EXPLORE MATERNA</span>
-
-        <h2>
-          Don't assume.
-          <span>Observe.</span>
-        </h2>
-
-        <p>
-          Explore the source, inspect the implementation
-          and evaluate the behavioral testing foundation.
-        </p>
-
-        <a
-          class="button button-cta"
-          href="https://github.com/shaonkabir8/materna"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Explore Materna on GitHub
-          <span aria-hidden="true">↗</span>
+        <a class="hero-badge" href="https://www.npmjs.com/package/materna">
+          v0.1.0 — now on npm
+          <span class="badge-arrow" aria-hidden="true">→</span>
         </a>
 
-        <span class="cta-caption">
-          OPEN SOURCE · ENGINEERING FOUNDATION · NODE.JS
-        </span>
+        <h1 class="hero-title">Behavior is the evidence</h1>
+
+        <p class="hero-description">
+          Behavioral locale parity probing for Node.js and PostgreSQL.
+          Versions are metadata. Observed behavior is evidence.
+        </p>
+
+        <div class="install-box">
+
+          <div class="install-top">
+
+            <svg class="pkg-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M0 0v7.5h7.5V0zm8.25 0v7.5h7.498V0zm8.25 0v7.5H24V0zM8.25 8.25v7.5h7.498v-7.5zm8.25 0v7.5H24v-7.5zM0 16.5V24h7.5v-7.5zm8.25 0V24h7.498v-7.5zm8.25 0V24H24v-7.5z"/>
+            </svg>
+
+            <div class="pkg-tab-group" role="tablist" aria-label="Install method">
+
+              <button class="pkg-tab" id="tab-bun" role="tab" aria-selected="false" aria-controls="install-command" data-cmd="bun add materna">bun</button>
+
+              <button class="pkg-tab" id="tab-npm" role="tab" aria-selected="true" aria-controls="install-command" data-cmd="npm install materna">npm</button>
+
+              <button class="pkg-tab" id="tab-pnpm" role="tab" aria-selected="false" aria-controls="install-command" data-cmd="pnpm add materna">pnpm</button>
+
+              <button class="pkg-tab" id="tab-yarn" role="tab" aria-selected="false" aria-controls="install-command" data-cmd="yarn add materna">yarn</button>
+
+            </div>
+
+            <div class="install-actions">
+
+              <a
+                class="install-action install-action-labeled"
+                href="https://www.npmjs.com/package/materna"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View Materna on npm"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M12 5v14"/>
+                </svg>
+                <span>npm</span>
+              </a>
+
+              <button
+                class="install-action"
+                id="copyInstall"
+                type="button"
+                aria-label="Copy install command"
+              >
+                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                </svg>
+                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              </button>
+
+            </div>
+
+            <span class="visually-hidden" id="copyStatus" role="status" aria-live="polite"></span>
+
+          </div>
+
+          <code class="install-command" id="install-command" role="tabpanel" aria-labelledby="tab-npm"><span class="dollar" aria-hidden="true">$ </span><span class="cmd-dim">npm install </span><span class="cmd-pkg">materna</span></code>
+
+        </div>
+
+        <div class="hero-actions">
+
+          <a class="button button-primary" href="https://github.com/shaonkabir8/materna#-quick-start">
+            Get Started
+          </a>
+
+          <a class="button button-secondary" href="https://github.com/shaonkabir8/materna#-api-reference">
+            Browse the API
+          </a>
+
+        </div>
+
+        <button class="agent-copy" id="agentCopy" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+          </svg>
+          <span data-agent-label>Copy prompt for your agent</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Showcase -->
+    <section class="showcase" aria-label="Materna at a glance">
+
+      <div class="container showcase-grid">
+
+        <article class="showcase-card">
+
+          <span class="card-tag">PARITY PROBE</span>
+
+          <h2>Same input.<br>Two observations.</h2>
+
+          <p>
+            Node.js <code>Intl.Collator</code> and PostgreSQL <code>ORDER BY</code>,
+            probed over an immutable corpus and fingerprinted with SHA-256.
+          </p>
+
+          <span class="card-chip">materna</span>
+
+        </article>
+
+        <article class="showcase-card card-quote">
+
+          <span class="card-quote-mark" aria-hidden="true">«</span>
+
+          <h2>Versions are metadata.<br>Observed behavior is evidence.</h2>
+
+          <div class="quote-attribution">
+
+            <span class="quote-avatar" aria-hidden="true">MT</span>
+
+            <span>
+              <span class="quote-name">Materna</span><br>
+              <span class="quote-sub">Behavioral locale parity probing</span>
+            </span>
+
+          </div>
+
+        </article>
+
+        <article class="showcase-card card-command">
+
+          <h2>Compare in one command</h2>
+
+          <div class="command-line"><span class="dollar" aria-hidden="true">$ </span>npx materna compare \
+  --left node.json \
+  --right pg.json</div>
+
+          <p>
+            Strict exit codes: 0 PASS, 1 DIFFERENCE,
+            2 INCONCLUSIVE, 3 ERROR — CI-friendly by design.
+          </p>
+
+          <span class="card-chip">materna</span>
+
+        </article>
+
+        <article class="showcase-card card-report">
+
+          <h2>Deterministic HTML reports</h2>
+
+          <div class="report-mock" role="img" aria-label="Mock-up of a Materna HTML comparison report showing a DIFFERENCE status and the first differing position">
+
+            <div class="report-bar">
+              <span class="report-title">materna report.html</span>
+              <span class="report-status difference">DIFFERENCE</span>
+            </div>
+
+            <div class="report-row">
+              <span>first_difference</span>
+              <strong>index 1 · "ä" vs "å"</strong>
+            </div>
+
+            <div class="report-row">
+              <span>corpus</span>
+              <strong>collation-core-v1 · 16 samples</strong>
+            </div>
+
+            <div class="report-bars" aria-hidden="true">
+              <span></span><span></span><span class="mismatch"></span><span></span>
+              <span></span><span></span><span></span><span></span>
+              <span></span><span class="mismatch"></span><span></span><span></span>
+            </div>
+
+          </div>
+
+          <div class="report-note">
+            <span>Illustrative layout</span>
+            <span>No JavaScript in real reports</span>
+          </div>
+
+        </article>
 
       </div>
 
@@ -2734,447 +1117,198 @@ console.log(result.status);'
   </main>
 
 
-  <!-- Footer -->
   <footer class="site-footer">
 
-    <div class="section-shell">
+    <div class="container">
 
-      <div class="footer-main">
-
-        <div class="footer-brand">
-
-          <a class="brand" href="#top">
-            <span class="brand-mark">M.</span>
-            <span>materna</span>
-          </a>
-
-          <p>
-            Behavioral compatibility testing.
-            Evidence over assumptions.
-          </p>
-
-        </div>
-
-        <div class="footer-links">
-
-          <div>
-            <span class="footer-label">EXPLORE</span>
-            <a href="#problem">The problem</a>
-            <a href="#approach">Approach</a>
-            <a href="#workflow">Workflow</a>
-            <a href="#scope">Current scope</a>
-          </div>
-
-          <div>
-            <span class="footer-label">SOURCE</span>
-            <a
-              href="https://github.com/shaonkabir8/materna"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub ↗
-            </a>
-            <a
-              href="https://github.com/shaonkabir8/materna/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Issues ↗
-            </a>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="footer-bottom">
-
-        <span>© <span id="currentYear"></span> Materna</span>
-
-        <span class="footer-principle">
-          Versions are metadata. Behavior is evidence.
-        </span>
-
-        <a href="#top">Back to top ↑</a>
-
-      </div>
+      <p class="footer-line">
+        Built by <a href="https://github.com/shaonkabir8" target="_blank" rel="noopener noreferrer">Shaon Kabir</a>.
+        The source code is available on <a href="https://github.com/shaonkabir8/materna" target="_blank" rel="noopener noreferrer">GitHub</a>.
+      </p>
 
     </div>
 
   </footer>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    /* =========================================
-       MATERNA
-       Vanilla JavaScript interactions
-       ========================================= */
+    (function () {
+      'use strict';
 
-    "use strict";
+      var root = document.documentElement;
 
+      /* Theme */
 
-    /* -----------------------------------------
-       Theme management
-       ----------------------------------------- */
+      var themeToggle = document.getElementById('themeToggle');
 
-    const root = document.documentElement;
-
-    const themeToggle = document.getElementById("themeToggle");
-
-    const themeMeta = document.querySelector(
-      'meta[name="theme-color"]'
-    );
-
-    const systemTheme = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    );
-
-
-    function getPreferredTheme() {
-
-      try {
-        const savedTheme = localStorage.getItem("materna-theme");
-
-        if (
-          savedTheme === "light" ||
-          savedTheme === "dark"
-        ) {
-          return savedTheme;
-        }
-
-      } catch {
-        // Storage may be unavailable.
-      }
-
-      return systemTheme.matches ? "dark" : "light";
-    }
-
-
-    function applyTheme(theme) {
-
-      root.dataset.theme = theme;
-
-      const isDark = theme === "dark";
-
-      themeToggle.setAttribute(
-        "aria-label",
-        isDark
-          ? "Switch to light mode"
-          : "Switch to dark mode"
-      );
-
-      if (themeMeta) {
-
-        themeMeta.setAttribute(
-          "content",
-          isDark ? "#101010" : "#fafafa"
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        root.classList.toggle('dark', theme === 'dark');
+        root.classList.toggle('light', theme === 'light');
+        themeToggle.setAttribute(
+          'aria-label',
+          theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
         );
-
       }
 
-    }
-
-
-    applyTheme(getPreferredTheme());
-
-
-    themeToggle.addEventListener("click", () => {
-
-      const nextTheme =
-        root.dataset.theme === "dark"
-          ? "light"
-          : "dark";
-
-      applyTheme(nextTheme);
-
-      try {
-        localStorage.setItem("materna-theme", nextTheme);
-      } catch {
-        // Theme still works for the current session.
-      }
-
-    });
-
-
-    /* Follow system theme only when the user
-       has not explicitly selected a preference. */
-
-    systemTheme.addEventListener("change", event => {
-
-      let savedTheme = null;
-
-      try {
-        savedTheme = localStorage.getItem("materna-theme");
-      } catch {
-        // Ignore unavailable storage.
-      }
-
-      if (!savedTheme) {
-
-        applyTheme(
-          event.matches ? "dark" : "light"
-        );
-
-      }
-
-    });
-
-
-    /* -----------------------------------------
-       Mobile navigation
-       ----------------------------------------- */
-
-    const menuToggle = document.getElementById("menuToggle");
-
-    const mobileNav = document.getElementById("mobileNav");
-
-
-    function closeMobileMenu() {
-
-      menuToggle.setAttribute("aria-expanded", "false");
-
-      menuToggle.setAttribute(
-        "aria-label",
-        "Open navigation"
-      );
-
-      mobileNav.hidden = true;
-
-    }
-
-
-    menuToggle.addEventListener("click", () => {
-
-      const isExpanded =
-        menuToggle.getAttribute("aria-expanded") === "true";
-
-      menuToggle.setAttribute(
-        "aria-expanded",
-        String(!isExpanded)
-      );
-
-      menuToggle.setAttribute(
-        "aria-label",
-        isExpanded
-          ? "Open navigation"
-          : "Close navigation"
-      );
-
-      mobileNav.hidden = isExpanded;
-
-    });
-
-
-    mobileNav.querySelectorAll("a").forEach(link => {
-
-      link.addEventListener("click", closeMobileMenu);
-
-    });
-
-
-    document.addEventListener("keydown", event => {
-
-      if (event.key === "Escape") {
-        closeMobileMenu();
-      }
-
-    });
-
-
-    document.addEventListener("click", event => {
-
-      if (
-        !mobileNav.hidden &&
-        !mobileNav.contains(event.target) &&
-        !menuToggle.contains(event.target)
-      ) {
-        closeMobileMenu();
-      }
-
-    });
-
-
-    /* -----------------------------------------
-       Scroll reveal
-       ----------------------------------------- */
-
-    const revealElements = document.querySelectorAll(".reveal");
-
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
-
-
-    if (
-      "IntersectionObserver" in window &&
-      !prefersReducedMotion.matches
-    ) {
-
-      const revealObserver = new IntersectionObserver(
-        (entries, observer) => {
-
-          entries.forEach(entry => {
-
-            if (entry.isIntersecting) {
-
-              entry.target.classList.add("is-visible");
-
-              observer.unobserve(entry.target);
-
-            }
-
-          });
-
-        },
-        {
-          threshold: 0.12,
-          rootMargin: "0px 0px -35px 0px"
-        }
-      );
-
-
-      revealElements.forEach(element => {
-
-        revealObserver.observe(element);
-
+      var stored = null;
+      try { stored = localStorage.getItem('materna-theme'); } catch (error) { /* unavailable */ }
+
+      applyTheme(stored === 'dark' ? 'dark' : 'light');
+
+      themeToggle.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+        try { localStorage.setItem('materna-theme', next); } catch (error) { /* unavailable */ }
       });
 
-    } else {
+      /* Mobile navigation */
 
-      revealElements.forEach(element => {
+      var menuToggle = document.getElementById('menuToggle');
+      var mobileNav = document.getElementById('mobileNav');
 
-        element.classList.add("is-visible");
-
+      menuToggle.addEventListener('click', function () {
+        var open = !mobileNav.hidden;
+        mobileNav.hidden = open;
+        menuToggle.setAttribute('aria-expanded', String(!open));
+        menuToggle.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation');
       });
 
-    }
+      mobileNav.addEventListener('click', function (event) {
+        if (event.target.closest('a')) {
+          mobileNav.hidden = true;
+          menuToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
 
+      /* Clipboard helpers
+         Feedback is only ever shown once the outcome of the write is
+         known. A rejected async write falls back to the legacy path,
+         whose boolean return value is also checked. */
 
-    /* -----------------------------------------
-       Clipboard
-       ----------------------------------------- */
+      function legacyCopy(text) {
+        var area = document.createElement('textarea');
+        area.value = text;
+        area.setAttribute('readonly', '');
+        area.style.position = 'fixed';
+        area.style.top = '-9999px';
+        document.body.appendChild(area);
 
-    const toast = document.getElementById("toast");
-
-    let toastTimeout;
-
-
-    function showToast(message) {
-
-      toast.textContent = message;
-
-      toast.classList.add("visible");
-
-      clearTimeout(toastTimeout);
-
-      toastTimeout = setTimeout(() => {
-
-        toast.classList.remove("visible");
-
-      }, 2200);
-
-    }
-
-
-    async function copyText(text) {
-
-      if (navigator.clipboard && window.isSecureContext) {
-
-        await navigator.clipboard.writeText(text);
-
-        return true;
-
-      }
-
-      const temporaryInput = document.createElement("textarea");
-
-      temporaryInput.value = text;
-
-      temporaryInput.style.position = "fixed";
-      temporaryInput.style.opacity = "0";
-      temporaryInput.style.pointerEvents = "none";
-
-      document.body.appendChild(temporaryInput);
-
-      temporaryInput.select();
-
-      const copied = document.execCommand("copy");
-
-      temporaryInput.remove();
-
-      return copied;
-
-    }
-
-
-    document.querySelectorAll("[data-copy]").forEach(button => {
-
-      button.addEventListener("click", async () => {
-
-        const text = button.dataset.copy;
-
+        var copied = false;
         try {
-
-          const copied = await copyText(text);
-
-          if (!copied) {
-            throw new Error("Clipboard operation failed");
-          }
-
-          button.textContent = "Copied";
-
-          showToast("Copied to clipboard");
-
-          setTimeout(() => {
-
-            button.textContent = "Copy";
-
-          }, 1800);
-
-        } catch {
-
-          showToast("Unable to copy. Select the code manually.");
-
+          area.select();
+          copied = document.execCommand('copy');
+        } catch (error) {
+          copied = false;
         }
 
-      });
-
-    });
-
-
-    /* -----------------------------------------
-       Footer year
-       ----------------------------------------- */
-
-    const currentYear = document.getElementById("currentYear");
-
-    currentYear.textContent = new Date().getFullYear();
-
-
-    /* -----------------------------------------
-       Close mobile menu when desktop layout
-       becomes active
-       ----------------------------------------- */
-
-    const desktopBreakpoint = window.matchMedia(
-      "(min-width: 651px)"
-    );
-
-    desktopBreakpoint.addEventListener("change", event => {
-
-      if (event.matches) {
-        closeMobileMenu();
+        document.body.removeChild(area);
+        return copied;
       }
 
-    });
+      function copyText(text) {
+        return new Promise(function (resolve) {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+              function () { resolve(true); },
+              function () { resolve(legacyCopy(text)); }
+            );
+            return;
+          }
+          resolve(legacyCopy(text));
+        });
+      }
 
+      /* Install tabs + copy */
 
-    /* -----------------------------------------
-       Initial state
-       ----------------------------------------- */
+      var tabs = Array.prototype.slice.call(document.querySelectorAll('.pkg-tab'));
+      var commandEl = document.getElementById('install-command');
+      var copyButton = document.getElementById('copyInstall');
+      var copyStatus = document.getElementById('copyStatus');
+      var agentCopy = document.getElementById('agentCopy');
+      var copyResetTimer = null;
 
-    document.documentElement.classList.add("js-ready");
+      var AGENT_PROMPT =
+        'Add Materna to my project. Materna is behavioral locale parity ' +
+        'probing for Node.js and PostgreSQL. Install it with: ' +
+        'npm install materna. Docs: https://github.com/shaonkabir8/materna#readme';
+
+      function renderCommand(command) {
+        commandEl.innerHTML = '';
+
+        var dollar = document.createElement('span');
+        dollar.className = 'dollar';
+        dollar.setAttribute('aria-hidden', 'true');
+        dollar.textContent = '$ ';
+
+        /* Split at the final space so the package name keeps the
+           .cmd-pkg treatment it has in the authored markup. */
+        var splitAt = command.lastIndexOf(' ');
+        var prefix = splitAt === -1 ? command : command.slice(0, splitAt + 1);
+        var pkg = splitAt === -1 ? '' : command.slice(splitAt + 1);
+
+        var dim = document.createElement('span');
+        dim.className = 'cmd-dim';
+        dim.textContent = prefix;
+
+        commandEl.appendChild(dollar);
+        commandEl.appendChild(dim);
+
+        if (pkg) {
+          var pkgEl = document.createElement('span');
+          pkgEl.className = 'cmd-pkg';
+          pkgEl.textContent = pkg;
+          commandEl.appendChild(pkgEl);
+        }
+      }
+
+      function flashCopyState(copied) {
+        copyButton.classList.remove('copied', 'error');
+        copyButton.classList.add(copied ? 'copied' : 'error');
+
+        copyStatus.textContent = copied
+          ? 'Install command copied to clipboard'
+          : 'Copy failed. Select the command and copy it manually.';
+
+        window.clearTimeout(copyResetTimer);
+        copyResetTimer = window.setTimeout(function () {
+          copyButton.classList.remove('copied', 'error');
+          copyStatus.textContent = '';
+        }, 1600);
+      }
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          tabs.forEach(function (other) {
+            other.setAttribute('aria-selected', String(other === tab));
+          });
+          commandEl.setAttribute('aria-labelledby', tab.id);
+          renderCommand(tab.getAttribute('data-cmd'));
+        });
+      });
+
+      copyButton.addEventListener('click', function () {
+        var active = tabs.filter(function (tab) {
+          return tab.getAttribute('aria-selected') === 'true';
+        })[0];
+        var command = active ? active.getAttribute('data-cmd') : '';
+
+        if (!command) { return; }
+
+        copyText(command).then(flashCopyState);
+      });
+
+      var agentLabel = agentCopy.querySelector('[data-agent-label]');
+
+      agentCopy.addEventListener('click', function () {
+        copyText(AGENT_PROMPT).then(function (copied) {
+          agentLabel.textContent = copied ? 'Copied' : 'Copy failed';
+          window.setTimeout(function () {
+            agentLabel.textContent = 'Copy prompt for your agent';
+          }, 1600);
+        });
+      });
+    }());
   </script>
 
 </body>
