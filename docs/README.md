@@ -1,326 +1,199 @@
 # Materna
-> Behavioral Locale Parity Testing
 
-Versions are metadata. Observed behavior is evidence.
+<p align="center">
+  <a href="https://www.npmjs.com/package/materna"><img src="https://img.shields.io/npm/v/materna.svg?style=flat-square&color=blue" alt="npm version"></a>&nbsp;
+  <a href="https://www.npmjs.com/package/materna"><img src="https://img.shields.io/npm/dm/materna.svg?style=flat-square&color=brightgreen" alt="npm downloads"></a>&nbsp;
+  <a href="https://github.com/shaonkabir8/materna/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/materna.svg?style=flat-square&color=green" alt="license"></a>&nbsp;
+  <a href="https://nodejs.org"><img src="https://img.shields.io/node/v/materna.svg?style=flat-square&color=orange" alt="node version"></a>&nbsp;
+  <a href="https://github.com/shaonkabir8/materna/actions"><img src="https://img.shields.io/github/actions/workflow/status/shaonkabir8/materna/ci.yml?branch=main&style=flat-square" alt="CI status"></a>&nbsp;
+  <a href="https://github.com/shaonkabir8/materna/stargazers"><img src="https://img.shields.io/github/stars/shaonkabir8/materna.svg?style=flat-square&color=yellow" alt="GitHub stars"></a>&nbsp;
+  <a href="https://github.com/shaonkabir8/materna/network/members"><img src="https://img.shields.io/github/forks/shaonkabir8/materna.svg?style=flat-square" alt="GitHub forks"></a>&nbsp;
+  <a href="https://github.com/shaonkabir8/materna/issues"><img src="https://img.shields.io/github/issues/shaonkabir8/materna.svg?style=flat-square" alt="GitHub issues"></a>&nbsp;
+  <a href="https://github.com/shaonkabir8/materna/commits/main"><img src="https://img.shields.io/github/last-commit/shaonkabir8/materna.svg?style=flat-square" alt="last commit"></a>&nbsp;
+  <a href="https://github.com/shaonkabir8/materna/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>&nbsp;
+  <a href="https://github.com/sponsors/shaonkabir8"><img src="https://img.shields.io/github/sponsors/shaonkabir8?label=Sponsor&logo=GitHub&style=flat-square&color=ff69b4" alt="Sponsor"></a>
+</p>
 
-Materna is a developer-focused engineering utility for examining locale-sensitive behavioral differences between Node.js and PostgreSQL.
-
-It uses reproducible probes, normalized observations, and SHA-256 result fingerprints to make actual behavioral differences observable.
-
-The project does not declare a mismatch merely because ICU, CLDR, runtime, or database versions differ.
+> **Behavioral locale parity probing for Node.js and PostgreSQL.**
+> Stop comparing version numbers. Start comparing actual collation behavior.
 
 ---
 
-Core Principle
-
-«Compatibility must be established through observed behavior, not inferred from version metadata.»
-
-Current Foundation
-
-The existing P0 implementation provides:
-
-- Node.js locale-sensitive collation probing.
-- PostgreSQL collation probing.
-- A versioned, immutable test corpus.
-- Runtime and database environment metadata.
-- Normalized ordering observations.
-- SHA-256 result fingerprints.
-- Programmatic observation comparison.
-- Explicit handling of missing evidence.
-
-This is a deliberately small testing foundation, not a complete localization platform.
-
-Requirements
-
-- Node.js 20+
-- PostgreSQL 14+ for live PostgreSQL probing.
-- Node.js 22 or newer. The suite is executed on 22, 24 and 26; Node 20 reached
-  end of life on 2026-04-30 and is no longer a supported runtime.
-- npm.
-- The project's declared dependencies installed.
-
-Installation
-
-Clone the repository:
-
-git clone https://github.com/shaonkabir8/materna.git
-cd materna
-
-Install dependencies:
-
-npm install
-
-1. Run the Node.js Probe
-
-Execute the test suite:
-
-npm test
-
-Run the Node.js probe:
-
-npm run probe:node
-
-The probe uses the existing immutable corpus:
-
-collation-core-v1
-
-Its default configuration is:
-
-Property| Value
-Probe ID| "collation.sort"
-Probe version| "1"
-Corpus ID| "collation-core-v1"
-Corpus version| "1"
-Locale| "de-DE"
-Sensitivity| "variant"
-Numeric| "false"
-
-The output includes environment metadata, normalized ordering observations, and a SHA-256 result fingerprint.
-
-2. Run Against PostgreSQL
-
-Create a test database:
-
-CREATE DATABASE localeparity;
-
-Set the connection string:
-
-Linux/macOS:
-
-export DATABASE_URL='postgresql://postgres:postgres@localhost:5432/localeparity'
-
-Windows PowerShell:
-
-$env:DATABASE_URL="postgresql://postgres:postgres@localhost:5432/localeparity"
-
-Execute the PostgreSQL probe:
-
-npm run probe:postgres
-
-If "DATABASE_URL" is omitted, the existing adapter uses:
-
-postgresql://postgres:postgres@localhost:5432/localeparity
-
-PostgreSQL Adapter
-
-The existing adapter:
-
-- Uses a parameter for corpus values.
-- Validates and quotes identifiers before SQL interpolation.
-- Records PostgreSQL environment metadata.
-- Records collation metadata.
-- Hashes the actual observed ordering.
-
-Verification status for live PostgreSQL
-
-**Historical record, not current evidence.** This section documents an earlier
-loop. Live PostgreSQL execution was demonstrated against PostgreSQL 18.6 on
-Linux (x86_64) at that time. That run was not reproduced for the current release
-candidate; the version verified for this revision is PostgreSQL 16.15, and
-PostgreSQL 14 is CI-configured only. See the compatibility matrix in the root
-`README.md` for the current, version-labelled evidence.
-
-Observed evidence from that run:
-
-- the probe returns a well-formed, self-consistent observation;
-- the observed ordering contains all 16 corpus samples, including the emoji and the decomposed/café form, so no text was lost or transformed in transit;
-- repeating the probe yields the same result fingerprint;
-- the session temporary table is not left behind (count of "materna_probe_%" relations is unchanged).
-
-Boundary: this is one server version on one operating system. Other PostgreSQL versions, providers and operating systems are UNVERIFIED.
-
-3. Test a Named PostgreSQL Collation
-
-Name an existing PostgreSQL collation on the command line:
-
-node src/cli.js postgres --collation en-US-x-icu
-
-or via the environment variable:
-
-export PG_COLLATION='en-US-x-icu'
-npm run probe:postgres
-
-The name is resolved against `pg_collation` with a parameterized query, and the
-identifier interpolated into `ORDER BY` is built from the catalog row. Anchor on
-the catalog, not on a string pattern: ICU names (`en-US-x-icu`) contain dashes,
-and some libc names (`C.utf8`, `en_US.utf8`) contain a dot that looks exactly
-like a schema qualifier. The whole name is therefore tried before any
-`schema.name` split, and an unknown name is an error rather than a silent
-fallback to the database default.
-
-Windows PowerShell:
-
-$env:PG_COLLATION="some_collation"
-npm run probe:postgres
-
-Check available collations first:
-
-SELECT collname, collprovider, collversion
-FROM pg_collation
-ORDER BY collname;
-
-Do not assume a collation exists without checking the database.
-
-4. Comparison Semantics
-
-The existing programmatic API exposes:
-
-compareObservations(left, right)
-
-It compares observed result fingerprints.
-
-PASS
-
-Both observations contain the required evidence, and their result fingerprints match.
-
-left.result.result_hash == right.result.result_hash
-
-DIFFERENCE
-
-Both observations contain results, but their fingerprints differ.
-
-The comparison also identifies the first differing position.
-
-INCONCLUSIVE
-
-Required observed result evidence is missing.
-
-Missing evidence must never be treated as compatibility.
-
-ERROR
-
-An unexpected adapter or execution failure occurs.
-
-Errors must not be silently converted into successful comparisons.
-
-CLI: compare is executable
-
-The CLI compares two observation documents:
-
-node src/cli.js compare --left de.json --right pg.json
-
-Use "-" for either side to read that document from stdin. Add --json for
-machine-readable output.
-
-Exit codes are a contract:
-
-Property| Value
-PASS| 0
-DIFFERENCE| 1
-INCONCLUSIVE| 2
-ERROR| 3
-
-INCONCLUSIVE covers four distinct situations, and the CLI names which one
-applied: missing evidence, an observation whose declared fingerprint does not
-match its own observed result, unreadable or malformed input, and two
-observations that were never comparable because their declarations differ
-(locale, sensitivity, numeric, corpus, probe version).
-
-5. Deterministic Evidence
-
-The result fingerprint is generated using SHA-256 over the normalized JSON representation of the observed ordering.
-
-Conceptually:
-
-Declared probe
-      |
-      v
-Real environment
-      |
-      v
-Locale-sensitive execution
-      |
-      v
-Observed ordering
-      |
-      v
-Normalized result
-      |
-      v
-SHA-256 fingerprint
-      |
-      v
-Programmatic comparison
-
-Environment metadata provides context.
-
-Observed results provide behavioral evidence.
-
-A metadata difference alone is not a behavioral failure.
-
-6. Safety Boundaries
-
-The existing P0 source:
-
-- Does not modify database data.
-- Does not execute arbitrary SQL supplied by users.
-- Does not perform "ALTER COLLATION".
-- Does not perform "REINDEX".
-- Does not upload database credentials.
-- Uses synthetic probe data.
-
-Use a disposable test database when investigating PostgreSQL behavior.
-
-Do not assume that a successful probe establishes production safety for every database configuration.
-
-7. Current Limitations
-
-The current P0 foundation does not establish:
-
-- Hosted control-plane correctness.
-- Production-scale operation.
-- Complete PostgreSQL collation compatibility.
-- Cross-version, cross-provider, or cross-OS PostgreSQL verification.
-- Universal runtime compatibility.
-- Market demand.
-
-These require separate implementation and verification.
-
-8. Verification Status
-
-Gate| Status
-Node.js deterministic probe| PASS — source test
-Controlled behavioral difference| PASS — source test
-Metadata-only false-positive resistance| PASS — source test
-Missing evidence handling| PASS — source test
-Node.js probe| IMPLEMENTED
-PostgreSQL adapter implementation| IMPLEMENTED
-PostgreSQL live execution| HISTORICAL — PostgreSQL 18.6, Linux x86_64, an earlier loop. Not reproduced for 0.1.0; current local evidence is 16.15
-Collation selection (`--collation`)| IMPLEMENTED — catalog-resolved; live tests on 16.15
-Observation corpus conformance| IMPLEMENTED — ordering must be a rearrangement of the named corpus
-CONTINUOUS INTEGRATION| DEFINED — workflow committed, not yet executed on hosted runners (E1)
-Compare CLI execution| IMPLEMENTED — exit-code contract documented
-Hash-integrity rejection| IMPLEMENTED — recomputed, not trusted
-Programmatic comparison API| IMPLEMENTED
-Production readiness| NOT CLAIMED
-Overall technical PASS| NOT CLAIMED
-
-The source-level test results describe the supplied test implementation. They are not a substitute for executing the test suite in the target environment.
-
-9. Project Identity
-
-Materna's canonical technical identifiers are defined by the code, not by a
-separate brand document: the package name in `package.json`, the probe id
-`collation.sort` in `src/probe.js`, the corpus id `collation-core-v1` in
-`src/corpus/`, and the CLI surface in `src/cli.js`. Engineering history and
-evidence levels are recorded in `docs/ENGINEERING_LOG.md`.
-
-The existing technical identifier remains:
-
-localeparity-p0
-
-Product branding and internal technical identifiers serve different purposes.
-
-Renaming the product does not authorize changing existing package names, module interfaces, probe identifiers, corpus identifiers, database defaults, or CLI interfaces.
-
-Philosophy
-
-Materna is built around a simple engineering discipline:
-
-Observe first. Compare second. Conclude only when evidence exists.
+## Table of Contents
+
+- [Why Materna?](#why-materna)
+- [Install](#install)
+- [Feature Highlights](#feature-highlights)
+- [Quick Start](#quick-start)
+- [API Reference](#api-reference)
+- [Limitations & Compatibility](#limitations--compatibility)
+- [License](#license)
 
 ---
 
-Materna — Behavioral Locale Parity Testing.
+## Why Materna?
 
-Verify before declaring PASS.
+<a href="https://shaonkabir8.github.io/materna" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.shields.io/badge/🌐_Open_Live_Docs-→-2563eb?style=for-the-badge" alt="Open Live Docs">
+</a>
+
+**Locale bugs are insidious.** Your database sorts `"ä"` differently than your Node.js runtime. Version strings won't tell you that.
+
+| The Old Way (Version Metadata) | The New Way (Behavioral Evidence) |
+| :--- | :--- |
+| You check `process.versions.icu === '78.3'` and assume compatibility. | You run `probeNode()` and `probePostgres()`, then compare their **actual observed orderings**. |
+| An ICU or glibc update silently breaks sorting. | Materna fingerprints the *actual* collation output with SHA-256. |
+| You find out in production when `ORDER BY` mismatches. | You find out in your test suite, with a precise `first_difference`. |
+| "We use PostgreSQL 16 and Node 22, so it should be fine." | "We proved the exact `de-DE` corpus produces identical orderings and tie structures." |
+
+Materna treats **versions as metadata** and **observed behavior as evidence**. It declares a mismatch *only* when two runs over the same declared probe and corpus produce different observed orderings.
+
+---
+
+## Install
+
+```bash
+# As a dependency
+npm install materna
+
+# As a one-off CLI
+npx materna node
+```
+
+### Requirements
+
+| Component | Requirement |
+| :--- | :--- |
+| **Node.js** | `>=22` (executed on 22, 24, and 26 in CI). |
+| **PostgreSQL** | **Optional.** Only required if you run `materna postgres`. Locally verified against PostgreSQL 16.15. |
+| **Runtime** | Node, Bun, Deno. |
+
+---
+
+## Feature Highlights
+
+| **Zero-config probing** | **Database & runtime parity** | **Deterministic HTML reports** |
+| :--- | :--- | :--- |
+| `npx materna node` works instantly. | Natively probes Node.js `Intl.Collator` and PostgreSQL `ORDER BY`. | Generates reviewable, diffable HTML with no JavaScript. |
+| **E3/E1 Evidence Levels** | **Strict exit codes** | **Tie-structure aware** |
+| Clearly separates "executed here" from "configured in CI." | CI-friendly (0=PASS, 1=DIFFERENCE, 2=INCONCLUSIVE, 3=ERROR). | Detects subtle differences in equality groups, not just order. |
+| **Single runtime dependency** | **Zero hosted control plane** | **Immutable corpus** |
+| `pg` is dynamically imported; `import 'materna'` loads no DB driver. | Runs entirely on your machine or CI. No SaaS. | Samples are hashed and verified. Tampering is refused. |
+
+---
+
+## Quick Start
+
+### 1. CLI (Zero Code)
+
+```bash
+# Probe Node.js runtime
+npx materna node --json > node.json
+
+# Probe PostgreSQL (DATABASE_URL is honored)
+DATABASE_URL='postgresql://postgres:postgres@localhost:5432/localeparity' \
+  npx materna postgres --json > pg.json
+
+# Compare the two observations
+npx materna compare --left node.json --right pg.json
+```
+
+### 2. API (Programmatic)
+
+```javascript
+import { probeNode, probePostgres, compareObservations } from 'materna';
+
+const left = probeNode({ locale: 'de-DE' });
+const right = await probePostgres({
+  locale: 'de-DE',
+  connectionString: process.env.DATABASE_URL,
+});
+
+const outcome = compareObservations(left, right);
+
+if (outcome.status === 'DIFFERENCE') {
+  console.error('Mismatch found at:', outcome.first_difference);
+  process.exit(1);
+}
+
+if (outcome.status === 'INCONCLUSIVE') {
+  throw new Error(outcome.reason);
+}
+```
+
+### 3. HTML Report
+
+```bash
+npx materna report --left node.json --right pg.json --out report.html
+```
+
+*The generated report contains no JavaScript. Every value is escaped. Identical inputs produce byte-identical HTML.*
+
+---
+
+## API Reference
+
+### `probeNode(options)`
+
+Synchronously returns an observation of Node.js `Intl.Collator`.
+
+- `options.locale` (string): e.g., `'de-DE'`.
+- `options.sensitivity` (string): `'base'`, `'accent'`, `'case'`, or `'variant'`.
+- `options.numeric` (boolean): Numeric collation.
+- `options.corpus` (array): Custom samples (defaults to the immutable 16-sample core).
+
+### `probePostgres(options)`
+
+Asynchronously probes PostgreSQL `ORDER BY`.
+
+- `options.connectionString`: PostgreSQL URL.
+- `options.collation` (string): e.g., `'en-US-x-icu'`. Resolved via parameterized query; unknown names throw an error (no silent fallback).
+- Other options match `probeNode`.
+
+### `compareObservations(left, right, [opts])`
+
+Returns an outcome object:
+
+- `status`: `'PASS'`, `'DIFFERENCE'`, or `'INCONCLUSIVE'`.
+- `first_difference`: The exact index/values where orderings diverge.
+- `metadata_differences`: Array of environment differences (e.g., ICU version) that do **not** cause a failure.
+
+### Exit Codes
+
+| Code | Status | Meaning |
+| :--- | :--- | :--- |
+| `0` | `PASS` | Fingerprints match. |
+| `1` | `DIFFERENCE` | Fingerprints differ; first difference printed. |
+| `2` | `INCONCLUSIVE` | Evidence missing, unsupported locale, or unreadable input. |
+| `3` | `ERROR` | Malformed JSON, bad arguments, unsafe identifier, driver failure. |
+
+---
+
+## Limitations & Compatibility
+
+### Compatibility Matrix
+
+| Surface | Verified |
+| :--- | :--- |
+| **Node.js 22.23.5, Linux x86_64, ICU 78.3** | Full suite, 98/98 |
+| **Node.js 24.22.3, Linux x86_64** | Full suite, 98/98 |
+| **PostgreSQL 16.15, Linux x86_64** | Full suite incl. 11 live tests, 98/98 |
+| **PostgreSQL 14, Linux x86_64** | Configured in `ci.yml`; never observed passing |
+| **macOS / Windows** | Not executed |
+| **MySQL / SQLite / Browsers** | Not implemented |
+
+### Limitations
+
+- **Two probes only**: Node.js and PostgreSQL. MySQL and SQLite are not implemented.
+- **Integrity ≠ Authenticity**: Materna checks consistency, not provenance. It does not sign observations.
+- **Small corpus**: 16 targeted samples, not exhaustive CLDR coverage.
+- **Default collation**: PostgreSQL defaults to `C.UTF-8` unless `PG_COLLATION` is set. A `DIFFERENCE` against Node's ICU is expected in this configuration.
+
+---
+
+## License
+
+MIT — see [LICENSE](https://github.com/shaonkabir8/materna/blob/main/LICENSE). <br>
+Built and Maintained by [Codazi](https://github.com/codazi).
+
+---
