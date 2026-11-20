@@ -1,23 +1,19 @@
 # Materna
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/materna"><img src="https://img.shields.io/npm/v/materna.svg?style=flat-square&color=blue" alt="npm version"></a>&nbsp;
-  <a href="https://www.npmjs.com/package/materna"><img src="https://img.shields.io/npm/dm/materna.svg?style=flat-square&color=brightgreen" alt="npm downloads"></a>&nbsp;
-  <a href="https://github.com/shaonkabir8/materna/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/materna.svg?style=flat-square&color=green" alt="license"></a>&nbsp;
-  <a href="https://nodejs.org"><img src="https://img.shields.io/node/v/materna.svg?style=flat-square&color=orange" alt="node version"></a>&nbsp;
-  <a href="https://github.com/shaonkabir8/materna/actions"><img src="https://img.shields.io/github/actions/workflow/status/shaonkabir8/materna/ci.yml?branch=main&style=flat-square" alt="CI status"></a>&nbsp;
-  <a href="https://github.com/shaonkabir8/materna/stargazers"><img src="https://img.shields.io/github/stars/shaonkabir8/materna.svg?style=flat-square&color=yellow" alt="GitHub stars"></a>&nbsp;
-  <a href="https://github.com/shaonkabir8/materna/network/members"><img src="https://img.shields.io/github/forks/shaonkabir8/materna.svg?style=flat-square" alt="GitHub forks"></a>&nbsp;
-  <a href="https://github.com/shaonkabir8/materna/issues"><img src="https://img.shields.io/github/issues/shaonkabir8/materna.svg?style=flat-square" alt="GitHub issues"></a>&nbsp;
-  <a href="https://github.com/shaonkabir8/materna/commits/main"><img src="https://img.shields.io/github/last-commit/shaonkabir8/materna.svg?style=flat-square" alt="last commit"></a>&nbsp;
-  <a href="https://github.com/shaonkabir8/materna/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>&nbsp;
-  <a href="https://github.com/sponsors/shaonkabir8"><img src="https://img.shields.io/github/sponsors/shaonkabir8?label=Sponsor&logo=GitHub&style=flat-square&color=ff69b4" alt="Sponsor"></a>
-</p>
+[![npm version](https://img.shields.io/npm/v/materna.svg)](https://www.npmjs.com/package/materna)
+[![npm downloads](https://img.shields.io/npm/dm/materna.svg)](https://www.npmjs.com/package/materna)
+[![license](https://img.shields.io/npm/l/materna.svg)](https://github.com/shaonkabir8/materna/blob/main/LICENSE)
+[![node version](https://img.shields.io/node/v/materna.svg)](https://www.npmjs.com/package/materna)
+[![CI status](https://github.com/shaonkabir8/materna/actions/workflows/ci.yml/badge.svg)](https://github.com/shaonkabir8/materna/actions/workflows/ci.yml)
+[![GitHub stars](https://img.shields.io/github/stars/shaonkabir8/materna.svg)](https://github.com/shaonkabir8/materna/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/shaonkabir8/materna.svg)](https://github.com/shaonkabir8/materna/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/shaonkabir8/materna.svg)](https://github.com/shaonkabir8/materna/issues)
+[![last commit](https://img.shields.io/github/last-commit/shaonkabir8/materna.svg)](https://github.com/shaonkabir8/materna/commits/main)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/shaonkabir8/materna/blob/main/CONTRIBUTING.md)
+[![Sponsor](https://img.shields.io/badge/sponsor-30363D?logo=GitHub-Sponsors&logoColor=#EA4AAA)](https://github.com/sponsors/shaonkabir8)
 
-> **Behavioral locale parity probing for Node.js and PostgreSQL.**
+> **Behavioral locale parity probing for Node.js and PostgreSQL.**  
 > Stop comparing version numbers. Start comparing actual collation behavior.
-
----
 
 ## Table of Contents
 
@@ -26,15 +22,13 @@
 - [Feature Highlights](#feature-highlights)
 - [Quick Start](#quick-start)
 - [API Reference](#api-reference)
-- [Limitations & Compatibility](#limitations--compatibility)
+- [Limitations and Compatibility](#limitations-and-compatibility)
 - [License](#license)
-
----
 
 ## Why Materna?
 
 <a href="https://shaonkabir8.github.io/materna" target="_blank" rel="noopener noreferrer">
-  <img src="https://img.shields.io/badge/🌐_Open_Live_Docs-→-2563eb?style=for-the-badge" alt="Open Live Docs">
+  <img src="https://img.shields.io/badge/Open%20Live%20Docs-▶-blue" alt="Open Live Docs">
 </a>
 
 **Locale bugs are insidious.** Your database sorts `"ä"` differently than your Node.js runtime. Version strings won't tell you that.
@@ -47,8 +41,6 @@
 | "We use PostgreSQL 16 and Node 22, so it should be fine." | "We proved the exact `de-DE` corpus produces identical orderings and tie structures." |
 
 Materna treats **versions as metadata** and **observed behavior as evidence**. It declares a mismatch *only* when two runs over the same declared probe and corpus produce different observed orderings.
-
----
 
 ## Install
 
@@ -68,8 +60,6 @@ npx materna node
 | **PostgreSQL** | **Optional.** Only required if you run `materna postgres`. Locally verified against PostgreSQL 16.15. |
 | **Runtime** | Node, Bun, Deno. |
 
----
-
 ## Feature Highlights
 
 | **Zero-config probing** | **Database & runtime parity** | **Deterministic HTML reports** |
@@ -79,8 +69,6 @@ npx materna node
 | Clearly separates "executed here" from "configured in CI." | CI-friendly (0=PASS, 1=DIFFERENCE, 2=INCONCLUSIVE, 3=ERROR). | Detects subtle differences in equality groups, not just order. |
 | **Single runtime dependency** | **Zero hosted control plane** | **Immutable corpus** |
 | `pg` is dynamically imported; `import 'materna'` loads no DB driver. | Runs entirely on your machine or CI. No SaaS. | Samples are hashed and verified. Tampering is refused. |
-
----
 
 ## Quick Start
 
@@ -129,8 +117,6 @@ npx materna report --left node.json --right pg.json --out report.html
 
 *The generated report contains no JavaScript. Every value is escaped. Identical inputs produce byte-identical HTML.*
 
----
-
 ## API Reference
 
 ### `probeNode(options)`
@@ -167,9 +153,7 @@ Returns an outcome object:
 | `2` | `INCONCLUSIVE` | Evidence missing, unsupported locale, or unreadable input. |
 | `3` | `ERROR` | Malformed JSON, bad arguments, unsafe identifier, driver failure. |
 
----
-
-## Limitations & Compatibility
+## Limitations and Compatibility
 
 ### Compatibility Matrix
 
@@ -189,11 +173,8 @@ Returns an outcome object:
 - **Small corpus**: 16 targeted samples, not exhaustive CLDR coverage.
 - **Default collation**: PostgreSQL defaults to `C.UTF-8` unless `PG_COLLATION` is set. A `DIFFERENCE` against Node's ICU is expected in this configuration.
 
----
-
 ## License
 
-MIT — see [LICENSE](https://github.com/shaonkabir8/materna/blob/main/LICENSE). <br>
-Built and Maintained by [Codazi](https://github.com/codazi).
+MIT — see [LICENSE](https://github.com/shaonkabir8/materna/blob/main/LICENSE).
 
----
+Built and Maintained by [Codazi](https://github.com/codazi).
