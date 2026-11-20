@@ -1,26 +1,48 @@
 {
   "name": "materna",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": false,
   "description": "Behavioral locale parity probing for Node.js and PostgreSQL",
   "type": "module",
-  "main": "./src/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
   "exports": {
-    ".": "./src/index.js",
-    "./cli": "./src/cli.js",
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./cli": {
+      "import": {
+        "types": "./dist/cli.d.ts",
+        "default": "./dist/cli.js"
+      },
+      "require": {
+        "types": "./dist/cli.d.cts",
+        "default": "./dist/cli.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "bin": {
-    "materna": "./src/cli.js"
+    "materna": "./dist/cli.js"
   },
   "files": [
-    "src"
+    "dist",
+    "CHANGELOG.md"
   ],
+  "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/shaonkabir8/materna"
+    "url": "git+https://github.com/shaonkabir8/materna.git"
   },
-  "homepage": "https://github.com/shaonkabir8/materna",
+  "homepage": "https://materna.js.org",
   "bugs": {
     "url": "https://github.com/shaonkabir8/materna/issues"
   },
@@ -39,10 +61,17 @@
     "unicode"
   ],
   "scripts": {
+    "build": "tsup",
     "test": "node --test",
+    "test:coverage": "node --test --experimental-test-coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
     "probe:node": "node src/cli.js node",
     "probe:postgres": "node src/cli.js postgres",
-    "prepublishOnly": "npm test"
+    "check:package": "publint && attw --pack --profile node16",
+    "prepublishOnly": "npm run build && npm test && npm run check:package"
   },
   "engines": {
     "node": ">=22"
@@ -50,8 +79,21 @@
   "dependencies": {
     "pg": "^8.16.3"
   },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
+    "prettier": "^3.0.0",
+    "publint": "^0.3.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "overrides": {
+    "fflate": "0.8.2"
   }
 }
