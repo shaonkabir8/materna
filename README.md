@@ -177,4 +177,4 @@ Returns an outcome object:
 
 MIT — see [LICENSE](https://github.com/shaonkabir8/materna/blob/main/LICENSE).
 
-Built and Maintained by [Codazi](https://github.com/codazi).
+Built and Maintained by [Shaon Kabir](https://github.com/shaonkabir8).
