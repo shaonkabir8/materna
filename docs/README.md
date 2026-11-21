@@ -1,5 +1,18 @@
 # Materna
 
+<!-- i18n-nav:start -->
+<p align="center">
+  <strong>🇬🇧 English</strong>
+  <a href="README.es.md">🇪🇸 Español</a>
+  <a href="README.pt.md">🇧🇷 Português</a>
+  <a href="README.de.md">🇩🇪 Deutsch</a>
+  <a href="README.cn.md">🇨🇳 简体中文</a>
+  <a href="README.ru.md">🇷🇺 Русский</a>
+  <a href="README.tr.md">🇹🇷 Türkçe</a>
+  <a href="README.ja.md">🇯🇵 日本語</a>
+</p>
+<!-- i18n-nav:end -->
+
 <p align="center">
   <a href="https://www.npmjs.com/package/materna"><img src="https://img.shields.io/npm/v/materna.svg?style=flat-square&color=blue" alt="npm version"></a>&nbsp;
   <a href="https://www.npmjs.com/package/materna"><img src="https://img.shields.io/npm/dm/materna.svg?style=flat-square&color=brightgreen" alt="npm downloads"></a>&nbsp;
