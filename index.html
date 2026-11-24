@@ -1,1315 +1,2402 @@
 <!DOCTYPE html>
-<html lang="en" class="light" data-theme="light">
+<html lang="en" data-theme="light">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <meta
-    name="description"
-    content="Materna is behavioral locale parity probing for Node.js and PostgreSQL. Stop comparing version numbers. Start comparing actual collation behavior."
-  >
-
-  <meta name="theme-color" content="#ffffff">
-
-  <title>Materna — Behavior is the Evidence</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
-  <style>
-    /* =========================================================
-       MATERNA
-       Landing shell: sticky bar, centered hero, install box,
-       showcase grid, one-line footer.
-       Independent implementation — no framework, no build step.
-       ========================================================= */
-
-    :root {
-      color-scheme: light;
-
-      --bg: #ffffff;
-      --fg: #0a0a0a;
-      --muted: #f5f5f5;
-      --muted-fg: #737373;
-      --border: #e5e5e5;
-      --border-strong: #d4d4d4;
-      --card: #ffffff;
-      --code-bg: #fafafa;
-
-      --dark-card: #0a0a0a;
-      --dark-card-border: #232323;
-      --dark-card-fg: #fafafa;
-      --dark-card-muted: #a3a3a3;
-
-      --accent-fg: #131313;
-      --accent-contrast: #ffffff;
-      --pink: #ec4899;
-
-      --success: #16a34a;
-      --warning: #d97706;
-      --danger: #dc2626;
-
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-
-      --header-height: 56px;
-      --container: 1200px;
-      --hero-text: 672px;
-
-      --font:
-        "Inter",
-        ui-sans-serif,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-      --mono:
-        ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        Monaco,
-        Consolas,
-        "Liberation Mono",
-        "Courier New",
-        monospace;
-
-      --transition: 180ms cubic-bezier(.2, .7, .2, 1);
-    }
-
-    html[data-theme="dark"] {
-      color-scheme: dark;
-
-      --bg: #0a0a0a;
-      --fg: #fafafa;
-      --muted: #171717;
-      --muted-fg: #a3a3a3;
-      --border: #262626;
-      --border-strong: #404040;
-      --card: #111111;
-      --code-bg: #1b1b1b;
-
-      --dark-card: #111111;
-      --dark-card-border: #2e2e2e;
-      --dark-card-fg: #fafafa;
-      --dark-card-muted: #a3a3a3;
-
-      --accent-fg: #fafafa;
-      --accent-contrast: #0a0a0a;
-    }
-
-    /* Reset */
-
-    * { box-sizing: border-box; }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: calc(var(--header-height) + 24px);
-    }
-
-    body {
-      margin: 0;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font);
-      font-size: 16px;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-
-    :focus-visible {
-      outline: 2px solid var(--fg);
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
-
-    .visually-hidden {
-      position: absolute;
-      width: 1px; height: 1px;
-      margin: -1px; padding: 0;
-      overflow: hidden;
-      clip: rect(0 0 0 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .container {
-      width: 100%;
-      max-width: var(--container);
-      margin-inline: auto;
-      padding-inline: 24px;
-    }
-
-    /* -----------------------------------------
-       Header
-       ----------------------------------------- */
-
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      height: var(--header-height);
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-shell {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-      font-size: 15px;
-      flex-shrink: 0;
-    }
-
-    .brand-mark {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      background: var(--fg);
-      color: var(--bg);
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .brand-sep {
-      color: var(--border-strong);
-      font-weight: 400;
-      user-select: none;
-    }
-
-    .desktop-nav {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .desktop-nav a {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 10px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--fg);
-      transition: background var(--transition), color var(--transition);
-    }
-
-    .desktop-nav a:hover { background: var(--muted); }
-
-    .nav-actions {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .star-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 32px;
-      padding: 0 10px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--fg);
-      transition: background var(--transition);
-    }
-
-    .star-badge:hover { background: var(--muted); }
-
-    .star-badge svg { width: 16px; height: 16px; }
-
-    .sponsor-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 32px;
-      padding: 0 10px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--fg);
-      transition: background var(--transition);
-    }
-
-    .sponsor-link:hover { background: var(--muted); }
-    .sponsor-link svg { width: 16px; height: 16px; color: var(--pink); }
-
-    .theme-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-sm);
-      transition: background var(--transition);
-    }
-
-    .theme-toggle:hover { background: var(--muted); }
-
-    .theme-toggle svg {
-      width: 16px;
-      height: 16px;
-      color: var(--fg);
-    }
-
-    html[data-theme="light"] .theme-toggle .sun-icon { display: none; }
-    html[data-theme="dark"] .theme-toggle .moon-icon { display: none; }
-
-    .mobile-menu-toggle {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-sm);
-    }
-
-    .mobile-menu-toggle:hover { background: var(--muted); }
-    .mobile-menu-toggle svg { width: 18px; height: 18px; color: var(--fg); }
-
-    .mobile-nav {
-      position: absolute;
-      top: var(--header-height);
-      left: 0;
-      right: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 8px 24px 16px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mobile-nav[hidden] { display: none; }
-
-    .mobile-nav a {
-      padding: 10px 4px;
-      font-size: 14px;
-      font-weight: 500;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .mobile-nav a:last-child { border-bottom: 0; }
-
-    /* -----------------------------------------
-       Hero
-       ----------------------------------------- */
-
-    .hero {
-      padding-top: 88px;
-      padding-bottom: 64px;
-    }
-
-    .hero-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
-      text-align: center;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--fg);
-      background: var(--bg);
-      transition: background var(--transition);
-    }
-
-    .hero-badge:hover { background: var(--muted); }
-    .hero-badge .badge-arrow { color: var(--muted-fg); }
-
-    .hero-title {
-      margin: 0;
-      max-width: 20ch;
-      font-size: clamp(40px, 7vw, 60px);
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      background: linear-gradient(to bottom, var(--fg) 50%, color-mix(in oklab, var(--fg) 65%, transparent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-wrap: balance;
-    }
-
-    .hero-description {
-      margin: 0;
-      max-width: var(--hero-text);
-      font-size: 20px;
-      line-height: 28px;
-      color: var(--muted-fg);
-      text-wrap: balance;
-    }
-
-    /* Install box */
-
-    .install-box {
-      width: min(576px, 100%);
-      border-radius: var(--radius-sm);
-      background: var(--code-bg);
-      overflow: hidden;
-      text-align: left;
-    }
-
-    .install-top {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 12px;
-      border-bottom: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
-    }
-
-    .pkg-icon {
-      width: 16px;
-      height: 16px;
-      color: var(--muted-fg);
-      flex-shrink: 0;
-    }
-
-    .pkg-tab-group {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      min-width: 0;
-      overflow-x: auto;
-    }
-
-    .pkg-tab {
-      display: inline-flex;
-      align-items: center;
-      height: 28px;
-      padding: 0 8px;
-      border: 1px solid transparent;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      white-space: nowrap;
-      color: var(--fg);
-      transition: background var(--transition), border-color var(--transition);
-    }
-
-    .pkg-tab:hover { background: color-mix(in oklab, var(--border) 40%, transparent); }
-
-    .pkg-tab[aria-selected="true"] {
-      background: var(--bg);
-      border-color: var(--border);
-    }
-
-    .install-actions {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      flex-shrink: 0;
-    }
-
-    .install-action {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: var(--radius-sm);
-      color: var(--fg);
-      transition: background var(--transition);
-    }
-
-    .install-action:hover { background: color-mix(in oklab, var(--border) 40%, transparent); }
-
-    .install-action svg { width: 16px; height: 16px; color: var(--muted-fg); }
-
-    .install-action-labeled {
-      width: auto;
-      gap: 4px;
-      padding: 0 8px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .install-action-labeled svg { width: 14px; height: 14px; }
-
-    .install-action .check-icon { display: none; }
-    .install-action.copied .copy-icon { display: none; }
-    .install-action.copied .check-icon { display: block; color: var(--success); }
-
-    /* Copy outcome is never signalled by colour alone: a live region
-       carries the same information for assistive technology. */
-    .install-action.error .copy-icon { color: var(--danger); }
-
-    .install-command {
-      display: block;
-      padding: 14px 16px;
-      font-family: var(--mono);
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--muted-fg);
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    .install-command .dollar { color: var(--muted-fg); user-select: none; }
-    .install-command .cmd-dim { color: var(--muted-fg); }
-    .install-command .cmd-pkg { color: var(--muted-fg); }
-
-    /* Hero actions */
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      height: 36px;
-      padding: 0 16px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      transition: background var(--transition), border-color var(--transition), opacity var(--transition);
-    }
-
-    .button-primary {
-      background: var(--accent-fg);
-      color: var(--accent-contrast);
-    }
-
-    .button-primary:hover { opacity: 0.88; }
-
-    .button-secondary {
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--fg);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    .button-secondary:hover { background: var(--muted); }
-
-    .agent-copy {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 28px;
-      padding: 0 10px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted-fg);
-      transition: color var(--transition), background var(--transition);
-    }
-
-    .agent-copy:hover { color: var(--fg); background: var(--muted); }
-    .agent-copy svg { width: 12px; height: 12px; }
-
-    /* -----------------------------------------
-       Showcase grid
-       ----------------------------------------- */
-
-    .showcase {
-      padding-bottom: 80px;
-    }
-
-    .showcase-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-    }
-
-    .showcase-card {
-      position: relative;
-      min-height: 300px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--dark-card-border);
-      background:
-        radial-gradient(120% 90% at 50% 0%, rgba(124, 58, 237, 0.14), transparent 60%),
-        var(--dark-card);
-      color: var(--dark-card-fg);
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .showcase-card .card-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: auto;
-      align-self: center;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--dark-card-muted);
-    }
-
-    .showcase-card .card-chip::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-      background: var(--pink);
-    }
-
-    .showcase-card .card-tag {
-      align-self: center;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      color: var(--dark-card-muted);
-      margin-bottom: 16px;
-    }
-
-    .showcase-card .card-tag::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--pink);
-    }
-
-    .showcase-card h2 {
-      margin: 0;
-      font-size: 30px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      text-align: center;
-      text-wrap: balance;
-    }
-
-    .showcase-card p {
-      margin: 12px 0 0;
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--dark-card-muted);
-      text-align: center;
-      max-width: 46ch;
-      margin-inline: auto;
-    }
-
-    /* Quote card */
-
-    .card-quote-mark {
-      font-family: var(--mono);
-      font-size: 40px;
-      font-weight: 700;
-      line-height: 1;
-      color: var(--pink);
-      margin-bottom: 12px;
-    }
-
-    .card-quote h2 { text-align: left; }
-    .card-quote .quote-attribution {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .quote-avatar {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.1);
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--dark-card-muted);
-    }
-
-    .quote-name { font-size: 13px; font-weight: 600; }
-    .quote-sub { font-size: 12px; color: var(--dark-card-muted); }
-
-    /* Command card */
-
-    .card-command h2 { text-align: left; }
-
-    .card-command .command-line {
-      margin-top: 20px;
-      padding: 12px 14px;
-      border: 1px solid var(--dark-card-border);
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.04);
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 20px;
-      color: var(--dark-card-fg);
-      overflow-x: auto;
-      white-space: pre;
-    }
-
-    .card-command .command-line .dollar { color: var(--dark-card-muted); user-select: none; }
-
-    .card-command .card-chip { align-self: flex-end; margin-top: auto; }
-
-    /* Report mockup card */
-
-    .card-report { padding: 24px; }
-
-    .card-report h2 { font-size: 24px; }
-
-    .report-mock {
-      margin-top: 20px;
-      border: 1px solid var(--dark-card-border);
-      border-radius: var(--radius-md);
-      background: #050505;
-      padding: 14px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--dark-card-muted);
-    }
-
-    .report-mock .report-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--dark-card-border);
-    }
-
-    .report-mock .report-title { color: var(--dark-card-fg); }
-
-    .report-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .report-status::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: currentColor;
-    }
-
-    .report-status.pass { color: var(--success); background: rgba(22, 163, 74, 0.12); }
-    .report-status.difference { color: var(--danger); background: rgba(220, 38, 38, 0.12); }
-
-    .report-mock .report-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding-top: 10px;
-    }
-
-    .report-mock .report-row strong { color: var(--dark-card-fg); font-weight: 500; }
-
-    .report-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      height: 64px;
-      margin-top: 14px;
-    }
-
-    .report-bars span {
-      flex: 1;
-      border-radius: 4px 4px 0 0;
-      background: rgba(255, 255, 255, 0.14);
-    }
-
-    .report-bars span.mismatch { background: var(--pink); }
-
-    .report-note {
-      margin-top: 12px;
-      font-family: var(--font);
-      font-size: 11px;
-      color: var(--dark-card-muted);
-      display: flex;
-      justify-content: space-between;
-    }
-
-    /* -----------------------------------------
-       Footer
-       ----------------------------------------- */
-
-    .site-footer {
-      border-top: 1px solid var(--border);
-      padding: 32px 0;
-    }
-
-    .footer-line {
-      margin: 0;
-      text-align: center;
-      font-size: 14px;
-      color: var(--muted-fg);
-    }
-
-    .footer-line a {
-      color: var(--fg);
-      font-weight: 500;
-      text-decoration: underline;
-      text-underline-offset: 4px;
-    }
-
-    /* -----------------------------------------
-       Responsive
-       ----------------------------------------- */
-
-    @media (max-width: 900px) {
-      .showcase-grid { grid-template-columns: 1fr; }
-      .showcase-card { min-height: 260px; }
-    }
-
-    @media (max-width: 767px) {
-      .desktop-nav { display: none; }
-      .mobile-menu-toggle { display: inline-flex; }
-
-      .hero { padding-top: 56px; padding-bottom: 48px; }
-      .hero-title { font-size: clamp(34px, 9vw, 44px); }
-      .hero-description { font-size: 17px; line-height: 26px; }
-
-      .install-actions .install-action span { display: none; }
-
-      .showcase { padding-bottom: 56px; }
-      .showcase-card { padding: 24px; }
-      .showcase-card h2 { font-size: 24px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      * { transition: none !important; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>materna — Behavior is the evidence</title>
+    <meta name="description" content="Behavioral locale parity probing for Node.js and PostgreSQL. Versions are metadata. Observed behavior is evidence. Zero hosted control plane. MIT licensed.">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#fafafa">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; form-action 'self' https://buttondown.com; upgrade-insecure-requests">
+    <link rel="canonical" href="https://materna.js.org/">
+    <link rel="alternate" type="text/markdown" href="./llms.txt" title="llms.txt — machine-readable index">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="materna">
+    <meta property="og:title" content="materna — Behavior is the evidence">
+    <meta property="og:description" content="Behavioral locale parity probing for Node.js and PostgreSQL. SHA-256 digest comparison, immutable corpus, strict exit codes.">
+    <meta property="og:url" content="https://materna.js.org/">
+    <meta name="twitter:description" content="Behavioral locale parity probing for Node.js and PostgreSQL. Zero hosted control plane. MIT.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c5cff'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='13' font-weight='700' fill='%23fff' text-anchor='middle'%3EM.%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "materna",
+            "softwareVersion": "0.1.0",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Node.js 22+",
+            "description": "Behavioral locale parity probing for Node.js and PostgreSQL. Compares SHA-256 digests of observed collation behavior instead of version strings.",
+            "license": "https://opensource.org/licenses/MIT",
+            "codeRepository": "https://github.com/shaonkabir8/materna",
+            "url": "https://materna.js.org/",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+        }
+    </script>
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('materna-theme');
+                var dark = t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+            } catch (e) {}
+        })();
+    </script>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #fafafa;
+            --bg-elev: #ffffff;
+            --fg: #0a0a0a;
+            --fg-muted: #525252;
+            --fg-subtle: #a3a3a3;
+            --border: #e5e5e5;
+            --border-strong: #d4d4d4;
+            --muted: #f3f3f5;
+            --code-bg: #f7f7f8;
+            --accent: #7c5cff;
+            --accent-soft: rgba(124, 92, 255, .1);
+            --accent-strong: #6847ff;
+            --accent-fg: #131313;
+            --accent-contrast: #ffffff;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --green: #16a34a;
+            --blue: #2563eb;
+            --pink: #ec4899;
+            --brand-a: #7c5cff;
+            --brand-b: #ec4899;
+            --font: "Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --header-h: 56px;
+            --rail-w: 264px;
+            --container: 1200px;
+            --transition: 160ms cubic-bezier(.2, .7, .2, 1);
+            --spring: 520ms cubic-bezier(.16, 1, .3, 1);
+            --scrollbar-thumb: color-mix(in oklab, var(--accent) 42%, var(--border));
+            --scrollbar-thumb-hover: var(--accent);
+        }
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #08080c;
+            --bg-elev: #0f0f15;
+            --fg: #f5f5f7;
+            --fg-muted: #a1a1aa;
+            --fg-subtle: #71717a;
+            --border: #1e1e26;
+            --border-strong: #2e2e38;
+            --muted: #15151c;
+            --code-bg: #0c0c12;
+            --accent: #8b74ff;
+            --accent-soft: rgba(139, 116, 255, .14);
+            --accent-strong: #a48fff;
+            --accent-fg: #fafafa;
+            --accent-contrast: #131313;
+            --success: #4ade80;
+            --danger: #f87171;
+            --green: #4ade80;
+            --blue: #60a5fa;
+            --brand-a: #8b74ff;
+            --brand-b: #f472b6;
+            --scrollbar-thumb: color-mix(in oklab, var(--accent) 55%, var(--border));
+            --scrollbar-thumb-hover: var(--accent-strong);
+        }
+
+        * { box-sizing: border-box; }
+        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+        *::-webkit-scrollbar { width: 12px; height: 12px; }
+        *::-webkit-scrollbar-track { background: transparent; }
+        *::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 999px;
+            border: 3px solid var(--bg);
+            background-clip: padding-box;
+            transition: background 200ms ease;
+        }
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+            background-clip: padding-box;
+            border: 3px solid var(--bg);
+        }
+        *::-webkit-scrollbar-corner { background: transparent; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 24px); }
+
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: var(--font);
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+        code, pre, kbd { font-family: var(--mono); font-size: .875em; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+        .visually-hidden {
+            position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+            overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+        }
+
+        .skip {
+            position: fixed; top: 8px; left: 8px; z-index: 1000; padding: 8px 14px;
+            border-radius: 8px; background: var(--fg); color: var(--bg);
+            font-size: 13px; font-weight: 600; transform: translateY(-200%);
+            transition: transform var(--transition);
+        }
+        .skip:focus { transform: translateY(0); }
+
+        .container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: 24px; }
+
+        .site-header {
+            position: sticky; top: 0; z-index: 60; height: var(--header-h);
+            background: var(--bg); border-bottom: 1px solid var(--border);
+        }
+        .nav-shell { height: 100%; display: flex; align-items: center; gap: 8px; }
+
+        .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; flex-shrink: 0; }
+        .brand-mark {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 8px; background: var(--fg); color: var(--bg);
+            font-family: var(--mono); font-size: 14px; font-weight: 500;
+        }
+
+        .desktop-nav { display: flex; align-items: center; gap: 2px; }
+        .desktop-nav a {
+            display: inline-flex; align-items: center; padding: 6px 10px;
+            border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; color: var(--fg);
+            transition: background var(--transition), color var(--transition);
+        }
+        .desktop-nav a:hover { background: var(--muted); }
+
+        .nav-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+        .star-badge {
+            display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px;
+            border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; color: var(--fg);
+            transition: background var(--transition);
+        }
+        .star-badge:hover { background: var(--muted); }
+        .star-badge svg { width: 16px; height: 16px; }
+
+        .npm-link {
+            display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px;
+            border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; color: var(--fg);
+            transition: background var(--transition);
+        }
+        .npm-link:hover { background: var(--muted); }
+        .npm-link svg { width: 16px; height: 16px; }
+
+        .theme-toggle {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: var(--radius-sm);
+            transition: background var(--transition);
+        }
+        .theme-toggle:hover { background: var(--muted); }
+        .theme-toggle svg { width: 16px; height: 16px; color: var(--fg); }
+        html[data-theme="light"] .theme-toggle .sun-icon { display: none; }
+        html[data-theme="dark"] .theme-toggle .moon-icon { display: none; }
+
+        .mobile-menu-toggle {
+            display: none; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: var(--radius-sm);
+        }
+        .mobile-menu-toggle:hover { background: var(--muted); }
+        .mobile-menu-toggle svg { width: 18px; height: 18px; color: var(--fg); }
+
+        .hero {
+            max-width: var(--container); margin-inline: auto; padding: 96px 24px 80px;
+            text-align: center; display: flex; flex-direction: column; align-items: center; gap: 24px;
+        }
+
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
+            border-radius: 999px; border: 1px solid var(--border); background: var(--bg-elev);
+            font-size: 13px; font-weight: 500; color: var(--fg-muted);
+        }
+        .eyebrow .dot {
+            width: 8px; height: 8px; border-radius: 999px;
+            background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
+        }
+
+        .hero-title {
+            margin: 0; max-width: 20ch; font-size: clamp(40px, 6vw, 64px);
+            font-weight: 700; line-height: 1.05; letter-spacing: -0.035em;
+            text-wrap: balance;
+            background: linear-gradient(180deg, var(--fg) 60%, color-mix(in oklab, var(--fg) 70%, transparent));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+
+        .hero-lede {
+            margin: 0; max-width: 56ch; font-size: clamp(16px, 1.3vw, 19px);
+            line-height: 1.65; color: var(--fg-muted); text-wrap: pretty;
+        }
+        .hero-lede strong { color: var(--fg); font-weight: 600; }
+        .hero-lede code {
+            font-family: var(--mono); font-size: .85em; padding: 1px 6px; border-radius: 4px;
+            background: var(--code-bg); border: 1px solid var(--border); color: var(--fg);
+        }
+
+        .terminal {
+            width: 100%; max-width: 34rem; margin-top: 8px;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg-elev); overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 16px 40px -20px rgba(124, 92, 255, .28);
+            text-align: left;
+        }
+        html[data-theme="dark"] .terminal {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 24px 60px -20px rgba(139, 116, 255, .4);
+        }
+
+        .terminal-chrome {
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+            border-bottom: 1px solid var(--border); background: var(--muted);
+        }
+        .terminal-dots { display: inline-flex; gap: 6px; flex-shrink: 0; }
+        .terminal-dots span { width: 11px; height: 11px; border-radius: 999px; background: #ff5f57; }
+        .terminal-dots span:nth-child(2) { background: #febc2e; }
+        .terminal-dots span:nth-child(3) { background: #28c840; }
+
+        .pkg-tabs { display: flex; gap: 2px; overflow-x: auto; min-width: 0; scrollbar-width: none; }
+        .pkg-tabs::-webkit-scrollbar { display: none; }
+        .pkg-tab {
+            height: 26px; padding: 0 9px; border-radius: 6px;
+            font-family: var(--font); font-size: 13px; font-weight: 500;
+            white-space: nowrap; color: var(--fg-muted);
+            transition: background var(--transition), color var(--transition);
+        }
+        .pkg-tab:hover { background: color-mix(in oklab, var(--border) 60%, transparent); color: var(--fg); }
+        .pkg-tab[aria-selected="true"] {
+            background: var(--bg-elev); color: var(--accent); font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+        }
+
+        .terminal-actions { margin-left: auto; display: flex; gap: 2px; flex-shrink: 0; }
+        .terminal-actions .icon-btn { width: 28px; height: 28px; }
+        .terminal-actions .icon-btn svg { width: 16px; height: 16px; }
+        .terminal-actions .check-icon { display: none; color: var(--success); }
+        .terminal-actions.copied .copy-icon { display: none; }
+        .terminal-actions.copied .check-icon { display: block; }
+
+        .icon-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; border-radius: var(--radius-sm);
+            color: var(--fg-muted);
+            transition: background var(--transition), color var(--transition);
+        }
+        .icon-btn:hover { background: var(--muted); color: var(--fg); }
+        .icon-btn svg { width: 18px; height: 18px; }
+
+        .terminal-body {
+            padding: 14px 16px; font-family: var(--mono); font-size: 14px; line-height: 1.55;
+            display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px;
+            min-height: 52px; color: var(--fg);
+        }
+        .prompt { display: inline-flex; gap: 8px; flex-shrink: 0; user-select: none; font-weight: 500; }
+        .prompt .arrow { color: var(--green); font-weight: 700; }
+        .prompt .path { color: var(--blue); }
+        .typed { white-space: pre-wrap; word-break: break-all; color: var(--fg); }
+        .caret {
+            display: inline-block; width: 9px; height: 1.05em; background: currentColor;
+            margin-left: 2px; vertical-align: middle; animation: blink 1.06s step-end infinite;
+        }
+        @keyframes blink { 0%, 45% { opacity: 1; } 45.01%, 100% { opacity: 0; } }
+
+        .hero-actions {
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            justify-content: center; margin-top: 8px;
+        }
+
+        .button {
+            display: inline-flex; align-items: center; height: 36px; padding: 0 16px;
+            border-radius: var(--radius-sm); font-size: 14px; font-weight: 500;
+            transition: background var(--transition), opacity var(--transition), border-color var(--transition);
+        }
+        .button-primary { background: var(--accent-fg); color: var(--accent-contrast); }
+        .button-primary:hover { opacity: .88; }
+        .button-secondary {
+            border: 1px solid var(--border); background: var(--bg); color: var(--fg);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+        }
+        .button-secondary:hover { background: var(--muted); }
+
+        .agent-copy {
+            display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px;
+            border-radius: var(--radius-sm); font-size: 12px; font-weight: 500;
+            color: var(--fg-muted);
+            transition: color var(--transition), background var(--transition);
+        }
+        .agent-copy:hover { color: var(--fg); background: var(--muted); }
+        .agent-copy svg { width: 12px; height: 12px; }
+        .agent-copy.copied { color: var(--success); }
+
+        .layout {
+            max-width: var(--container); margin-inline: auto; padding-inline: 24px;
+            display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); gap: 48px;
+            border-top: 1px solid var(--border); padding-top: 48px; padding-bottom: 80px;
+            position: relative;
+        }
+
+        .rail {
+            position: sticky; top: calc(var(--header-h) + 24px);
+            height: calc(100vh - var(--header-h) - 24px);
+            overflow-y: auto; padding-right: 8px; font-size: 14px;
+            scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent;
+        }
+
+        .rail-group { margin-bottom: 24px; }
+        .rail-group h4 {
+            margin: 0 0 8px; padding-inline: 12px; font-family: var(--font);
+            font-size: 11px; font-weight: 600; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--fg-subtle);
+        }
+        .rail-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+        .rail-list a {
+            display: block; padding: 6px 12px; border-radius: var(--radius-sm);
+            color: var(--fg-muted); font-size: 14px; border-left: 2px solid transparent;
+            transition: color var(--transition), background var(--transition), border-color var(--transition);
+        }
+        .rail-list a:hover { color: var(--fg); background: var(--muted); }
+        .rail-list a.active {
+            color: var(--accent); background: var(--accent-soft);
+            border-left-color: var(--accent); font-weight: 500;
+        }
+
+        .rail-backdrop {
+            display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .5);
+            z-index: 55; opacity: 0; transition: opacity 180ms ease;
+        }
+        .rail-backdrop.open { opacity: 1; }
+
+        .content { min-width: 0; padding-top: 0; }
+        .section { scroll-margin-top: calc(var(--header-h) + 24px); margin-bottom: 64px; }
+        .section:last-of-type { margin-bottom: 0; }
+
+        .sec-meta {
+            display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem;
+            font-family: var(--mono); font-size: .68rem; color: var(--fg-subtle);
+            text-transform: uppercase; letter-spacing: .08em;
+        }
+        .sec-meta::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        .sec-lead { color: var(--fg-muted); font-size: .88rem; margin-bottom: 1.25rem; max-width: 640px; }
+
+        .section h2 {
+            margin: 0 0 1rem; font-size: 1.35rem; line-height: 1.25;
+            letter-spacing: -.02em; font-weight: 600;
+            display: flex; align-items: center; gap: .5rem;
+        }
+        .section h3 { margin: 32px 0 10px; font-size: 18px; line-height: 1.3; font-weight: 600; }
+        .section p { margin: 0 0 16px; color: var(--fg-muted); }
+        .section p strong { color: var(--fg); font-weight: 600; }
+        .section code {
+            padding: 1px 6px; border-radius: 4px; background: var(--code-bg);
+            border: 1px solid var(--border); font-size: .85em; color: var(--fg);
+        }
+        .section ul, .section ol { margin: 0 0 20px; padding-left: 22px; color: var(--fg-muted); }
+        .section li { margin: 6px 0; }
+        .section li::marker { color: var(--fg-subtle); }
+
+        .fgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+        @media(max-width:700px) { .fgrid { grid-template-columns: 1fr; } }
+
+        .fcard {
+            background: var(--bg-elev); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: .9rem 1rem;
+            transition: border-color .12s, background .12s;
+        }
+        .fcard:hover { border-color: var(--border-strong); background: var(--muted); }
+        .fcard-head { display: flex; align-items: center; gap: .45rem; margin-bottom: .35rem; }
+        .fcard-head .ico { font-size: .95rem; }
+        .fcard-head h3 { font-size: .82rem; margin: 0; }
+        .fcard p { font-size: .78rem; color: var(--fg-muted); line-height: 1.5; }
+        .fcard code { font-size: .8em; }
+
+        .api-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-bottom: 1.25rem; }
+        .api-table th {
+            text-align: left; font-weight: 600; color: var(--fg);
+            padding: .45rem .65rem; border-bottom: 1px solid var(--border-strong);
+        }
+        .api-table td {
+            padding: .5rem .65rem; border-bottom: 1px solid var(--border);
+            color: var(--fg-muted); vertical-align: top;
+        }
+        .api-table tr:last-child td { border-bottom: none; }
+        .api-table tr:hover td { background: var(--muted); }
+        .api-table td:first-child {
+            font-family: var(--mono); font-size: .78rem; color: var(--fg); white-space: nowrap;
+        }
+
+        .callout {
+            display: flex; gap: .6rem; padding: .7rem .9rem; margin: 1rem 0;
+            background: var(--bg-elev); border: 1px solid var(--border);
+            border-left: 2px solid var(--accent); border-radius: var(--radius-sm);
+            font-size: .8rem; color: var(--fg-muted);
+        }
+        .callout .ic { flex-shrink: 0; font-size: .9rem; }
+        .callout strong { color: var(--fg); }
+        .callout code { font-size: .82em; }
+
+        .contrib { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
+        @media(max-width:720px) { .contrib { grid-template-columns: repeat(2, 1fr); } }
+        .contrib a {
+            display: flex; flex-direction: column; align-items: center; gap: .3rem;
+            padding: .75rem .5rem; background: var(--bg-elev); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); font-size: .75rem; font-weight: 500;
+            color: var(--fg-muted); text-align: center; transition: all .12s;
+        }
+        .contrib a:hover { border-color: var(--accent); color: var(--fg); background: var(--muted); }
+        .contrib a .ico { font-size: 1rem; }
+
+        .usage-intro { max-width: 60ch; }
+        .usage-accordion {
+            margin: 24px 0 8px; border: 1px solid var(--border);
+            border-radius: var(--radius-md); background: var(--bg-elev); overflow: hidden;
+        }
+        .usage-item + .usage-item { border-top: 1px solid var(--border); }
+        .usage-trigger {
+            width: 100%; display: flex; align-items: center; gap: 14px;
+            padding: 18px 22px; text-align: left; color: var(--fg);
+            font-family: var(--font); transition: background var(--transition);
+        }
+        .usage-trigger:hover { background: var(--muted); }
+        .usage-trigger[aria-expanded="true"] { background: var(--muted); }
+        .usage-trigger:focus-visible { outline-offset: -2px; border-radius: 0; }
+        .usage-num { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--fg-subtle); min-width: 22px; }
+        .usage-title { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; color: var(--fg); }
+        .usage-desc { font-size: 13px; color: var(--fg-muted); margin-left: 6px; }
+        .usage-chevron {
+            margin-left: auto; flex-shrink: 0; width: 16px; height: 16px; color: var(--fg-muted);
+            transition: transform 240ms cubic-bezier(.2, .7, .2, 1), color var(--transition);
+        }
+        .usage-trigger[aria-expanded="true"] .usage-chevron { transform: rotate(180deg); color: var(--accent); }
+        .usage-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 320ms cubic-bezier(.2, .7, .2, 1); }
+        .usage-panel.open { grid-template-rows: 1fr; }
+        .usage-panel-inner { overflow: hidden; }
+        .usage-panel-content { padding: 0 22px 22px; }
+        .usage-panel-content .canvas { margin: 0; }
+        .usage-panel-content .canvas-window { margin: 0; }
+
+        .table-wrap {
+            margin: 16px 0 24px; border: 1px solid var(--border);
+            border-radius: var(--radius-md); overflow: hidden; background: var(--bg-elev);
+        }
+        .table-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .table-wrap thead { background: var(--muted); }
+        .table-wrap th {
+            text-align: left; padding: 10px 14px; font-weight: 600; font-size: 13px;
+            color: var(--fg); border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .table-wrap td {
+            padding: 12px 14px; border-bottom: 1px solid var(--border);
+            color: var(--fg-muted); vertical-align: top;
+        }
+        .table-wrap tbody tr:last-child td { border-bottom: 0; }
+        .table-wrap tbody tr:hover td { background: color-mix(in oklab, var(--muted) 60%, transparent); }
+        .table-wrap td code { font-size: 12.5px; }
+
+        .sig { color: var(--accent); font-weight: 500; white-space: nowrap; font-family: var(--mono); font-size: 13px; }
+        .yes { color: var(--success); font-weight: 600; }
+        .no { color: var(--danger); font-weight: 600; }
+
+        .canvas {
+            position: relative; margin: 20px 0 28px; padding: 20px;
+            border-radius: var(--radius-lg); border: 1px solid var(--border);
+            background: radial-gradient(120% 90% at 0% 0%, rgba(124, 92, 255, .14), transparent 55%), radial-gradient(120% 90% at 100% 100%, rgba(236, 72, 153, .12), transparent 55%), linear-gradient(135deg, #f8f6ff 0%, #fdf7fc 50%, #f2f7ff 100%);
+        }
+        html[data-theme="dark"] .canvas {
+            border-color: rgba(255, 255, 255, .08);
+            background: radial-gradient(120% 90% at 0% 0%, rgba(139, 116, 255, .22), transparent 55%), radial-gradient(120% 90% at 100% 100%, rgba(244, 114, 182, .16), transparent 55%), linear-gradient(135deg, #14121d 0%, #1c1220 50%, #101620 100%);
+        }
+        .canvas-window {
+            border-radius: 10px; background: #0d0d12; border: 1px solid rgba(255, 255, 255, .07);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .3), 0 24px 48px -20px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 255, 255, .02) inset;
+            overflow: hidden;
+        }
+        .canvas-chrome {
+            display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, .07); background: rgba(255, 255, 255, .02);
+        }
+        .canvas-dots { display: inline-flex; gap: 7px; flex-shrink: 0; }
+        .canvas-dots span { width: 11px; height: 11px; border-radius: 999px; background: #ff5f57; }
+        .canvas-dots span:nth-child(2) { background: #febc2e; }
+        .canvas-dots span:nth-child(3) { background: #28c840; }
+        .canvas-filename { font-family: var(--mono); font-size: 12px; font-weight: 500; color: #71717a; letter-spacing: .02em; }
+        .canvas-copy {
+            margin-left: auto; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; border-radius: 6px; color: #71717a;
+            transition: background 160ms ease, color 160ms ease;
+        }
+        .canvas-copy:hover { background: rgba(255, 255, 255, .08); color: #e4e4e7; }
+        .canvas-copy svg { width: 14px; height: 14px; }
+        .canvas-copy .check-icon { display: none; color: #4ade80; }
+        .canvas-copy.copied .copy-icon { display: none; }
+        .canvas-copy.copied .check-icon { display: block; }
+        .canvas-code {
+            margin: 0; padding: 20px 24px; overflow-x: auto;
+            font-family: var(--mono); font-size: 13px; line-height: 1.75;
+            color: #e4e4e7; background: transparent;
+            scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .15) transparent;
+        }
+        .canvas-code::-webkit-scrollbar { height: 6px; }
+        .canvas-code::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .15); border-radius: 3px; }
+
+        .tok-kw { color: #c792ea; }
+        .tok-str { color: #c3e88d; }
+        .tok-fn { color: #82aaff; }
+        .tok-num { color: #f78c6c; }
+        .tok-op { color: #89ddff; }
+        .tok-com { color: #546e7a; font-style: italic; }
+
+        /* ══════════ FAQ — animated SVG flowcharts ══════════ */
+        .faq-group {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--bg-elev);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .faq-item + .faq-item { border-top: 1px solid var(--border); }
+
+        .faq-q {
+            width: 100%;
+            min-height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 22px;
+            text-align: left;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--fg);
+            background: none;
+            border: 0;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .faq-q:hover { background: var(--muted); }
+
+        .faq-q svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            color: var(--fg-muted);
+            transition: transform var(--transition);
+        }
+
+        .faq-item.open .faq-q svg { transform: rotate(45deg); }
+
+        .faq-a {
+            padding: 0 22px 22px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--fg-muted);
+        }
+
+        .faq-a strong { color: var(--fg); }
+
+        .faq-a code {
+            font-family: var(--mono);
+            font-size: 12px;
+            background: var(--code-bg);
+            color: var(--fg);
+            padding: 1px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .flow-wrap {
+            margin: 16px auto 0;
+            padding: 18px 12px;
+            max-width: 460px;
+            border-radius: var(--radius-md);
+            border: 1px solid #232323;
+            background:
+                radial-gradient(120% 90% at 50% 0%, rgba(124, 58, 237, .14), transparent 60%),
+                #0a0a0a;
+            overflow: hidden;
+        }
+
+        .flow-svg { display: block; width: 100%; height: auto; }
+
+        .flow-node { transform-box: fill-box; transform-origin: center; }
+
+        .flow-node .node-ring {
+            opacity: 0;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .flow-node.landed .node-ring { animation: ringPulse 700ms cubic-bezier(.2, .7, .2, 1); }
+
+        @keyframes ringPulse {
+            0%   { opacity: .9; transform: scale(1); }
+            100% { opacity: 0;  transform: scale(1.18); }
+        }
+
+        .flow-replay {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            margin: 12px auto 0;
+            height: 32px;
+            padding: 0 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            color: var(--fg);
+            font-size: 12.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .flow-replay:hover { background: var(--muted); }
+
+        @media (prefers-reduced-motion: reduce) {
+            .flow-node,
+            .flow-node .node-ring {
+                opacity: 1 !important;
+                transform: none !important;
+                animation: none !important;
+            }
+        }
+
+        .newsletter-section { position: relative; }
+        .newsletter {
+            position: relative; overflow: hidden; margin: 8px 0 0; padding: 40px;
+            border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--border));
+            border-radius: 24px;
+            background:
+                radial-gradient(90% 120% at 0% 0%, var(--accent-soft), transparent 60%),
+                radial-gradient(80% 120% at 100% 100%, rgba(236, 72, 153, .10), transparent 60%),
+                var(--bg-elev);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 24px 64px -24px rgba(124, 92, 255, .22);
+            transition: border-color var(--spring), box-shadow var(--spring), transform var(--spring);
+        }
+        .newsletter::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--accent) 65%, transparent), transparent);
+            pointer-events: none;
+        }
+        .newsletter:focus-within {
+            border-color: color-mix(in oklab, var(--accent) 60%, var(--border));
+            box-shadow: 0 0 0 4px var(--accent-soft), 0 24px 64px -24px rgba(124, 92, 255, .45);
+        }
+
+        .nl-head { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+        .nl-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; flex-shrink: 0; border-radius: 13px;
+            background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
+            color: #fff; box-shadow: 0 8px 24px -10px rgba(124, 92, 255, .9);
+        }
+        .nl-badge svg { width: 20px; height: 20px; }
+        .nl-head h3 { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+        .nl-head p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--fg-muted); max-width: 56ch; }
+
+        .nl-form { display: flex; align-items: stretch; gap: 10px; }
+        .nl-field { position: relative; flex: 1 1 auto; min-width: 0; }
+        .nl-input {
+            width: 100%; height: 52px; padding: 20px 16px 8px;
+            border: 1px solid var(--border-strong); border-radius: 12px;
+            background: var(--bg); color: var(--fg);
+            font-family: var(--font); font-size: 15px; line-height: 1;
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+        }
+        .nl-input::placeholder { color: transparent; }
+        .nl-label {
+            position: absolute; left: 17px; top: 50%; transform: translateY(-50%);
+            font-size: 14px; color: var(--fg-subtle); pointer-events: none;
+            transform-origin: left center;
+            transition: top var(--spring), transform var(--spring), font-size var(--spring), color var(--transition), letter-spacing var(--spring);
+        }
+        .nl-input:focus + .nl-label,
+        .nl-input:not(:placeholder-shown) + .nl-label {
+            top: 11px; transform: none; font-size: 10px; font-weight: 600;
+            letter-spacing: .09em; text-transform: uppercase; color: var(--accent);
+        }
+        .nl-input:focus {
+            outline: none; border-color: var(--accent); background: var(--bg-elev);
+            box-shadow: 0 0 0 4px var(--accent-soft);
+        }
+        .nl-input:user-invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px color-mix(in oklab, var(--danger) 14%, transparent);
+        }
+        .nl-submit {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            height: 52px; padding: 0 24px; border-radius: 12px;
+            background: var(--accent-fg); color: var(--accent-contrast);
+            font-size: 14.5px; font-weight: 600; white-space: nowrap;
+            transition: transform var(--spring), opacity var(--transition), background var(--transition), box-shadow var(--spring);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+        }
+        .nl-submit:hover { opacity: .92; box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .35); }
+        .nl-submit:active { transform: scale(.96); }
+        .nl-submit:disabled { opacity: .6; cursor: progress; transform: none; }
+        .nl-submit svg { width: 16px; height: 16px; transition: transform var(--spring); }
+        .nl-submit:hover svg { transform: translateX(3px); }
+        .nl-check { display: none; }
+        .nl-form[data-state="done"] .nl-submit { background: var(--success); color: #fff; }
+        .nl-form[data-state="done"] .nl-arrow { display: none; }
+        .nl-form[data-state="done"] .nl-check { display: inline-block; }
+
+        .nl-status {
+            margin: 12px 0 0; min-height: 1.1em; font-size: 12.5px; line-height: 1.5;
+            color: var(--fg-subtle); transition: color var(--transition);
+        }
+        .nl-status[data-state="ok"] { color: var(--success); }
+        .nl-status[data-state="err"] { color: var(--danger); }
+        .nl-status[data-state="pending"] { color: var(--accent); }
+
+        .nl-trust {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px;
+            margin: 16px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--fg-subtle);
+        }
+        .nl-trust li { display: inline-flex; align-items: center; gap: 6px; }
+        .nl-trust svg { width: 13px; height: 13px; color: var(--success); flex-shrink: 0; }
+
+        .scroll-cta {
+            position: fixed; bottom: 28px; right: 28px; z-index: 45;
+            display: flex; flex-direction: column; gap: 2px; padding: 5px;
+            border-radius: 999px;
+            background: color-mix(in oklab, var(--bg-elev) 80%, transparent);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 16px 40px -16px rgba(0, 0, 0, .18);
+            opacity: 0; transform: translateY(20px) scale(.85); pointer-events: none;
+            transition: opacity 280ms cubic-bezier(.16, 1, .3, 1), transform 520ms cubic-bezier(.16, 1, .3, 1);
+        }
+        .scroll-cta.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .scroll-cta button {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; border-radius: 999px; color: var(--fg-muted);
+            transition: background 180ms ease, color 180ms ease, transform 320ms cubic-bezier(.16, 1, .3, 1);
+        }
+        .scroll-cta button:hover { background: var(--accent-soft); color: var(--accent); }
+        .scroll-cta button:active { transform: scale(.86); }
+        .scroll-cta button svg { width: 18px; height: 18px; transition: transform 320ms cubic-bezier(.16, 1, .3, 1); }
+        .scroll-cta .scroll-up:hover svg { transform: translateY(-2px); }
+        .scroll-cta .scroll-down:hover svg { transform: translateY(2px); }
+        .scroll-cta-divider { height: 1px; margin: 0 8px; background: var(--border); }
+
+        @media (max-width: 767px) {
+            .scroll-cta { bottom: 20px; right: 16px; }
+            .scroll-cta button { width: 34px; height: 34px; }
+        }
+
+        .site-footer {
+            position: relative; margin-top: 0; padding: 80px 24px 36px;
+            border-top: 1px solid var(--border);
+            background: radial-gradient(60% 80% at 50% 0%, var(--accent-soft), transparent 70%), var(--bg);
+        }
+        .site-footer::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--accent) 45%, transparent), transparent);
+            pointer-events: none;
+        }
+        .footer-main {
+            max-width: var(--container); margin: 0 auto;
+            display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr;
+            gap: 48px; padding-bottom: 48px;
+        }
+        .footer-brand { display: flex; flex-direction: column; gap: 16px; }
+        .footer-brand .brand { font-size: 15px; }
+        .footer-tagline {
+            margin: 0; max-width: 38ch; font-size: 13.5px; line-height: 1.6; color: var(--fg-muted);
+        }
+        .footer-socials { display: flex; gap: 8px; margin-top: 4px; }
+        .footer-socials a {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--bg-elev); color: var(--fg-muted);
+            transition: color 200ms ease, background 200ms ease, border-color 200ms ease, transform 320ms cubic-bezier(.16, 1, .3, 1);
+        }
+        .footer-socials a:hover {
+            color: var(--accent); border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+            background: var(--accent-soft); transform: translateY(-2px);
+        }
+        .footer-socials a svg { width: 16px; height: 16px; }
+
+        .footer-col h4 {
+            margin: 0 0 16px; font-size: 11px; font-weight: 700;
+            letter-spacing: .1em; text-transform: uppercase; color: var(--fg-subtle);
+        }
+        .footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+        .footer-col a { font-size: 14px; color: var(--fg-muted); transition: color 160ms ease; }
+        .footer-col a:hover { color: var(--fg); }
+
+        .footer-bottom {
+            max-width: var(--container); margin: 0 auto; padding-top: 32px;
+            border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 24px; flex-wrap: wrap; font-size: 13px; color: var(--fg-subtle);
+        }
+        .footer-bottom p { margin: 0; }
+        .footer-bottom a {
+            color: var(--fg-muted); text-decoration: underline; text-underline-offset: 3px;
+            text-decoration-thickness: 1px; transition: color 160ms ease;
+        }
+        .footer-bottom a:hover { color: var(--fg); text-decoration-thickness: 2px; }
+
+        .footer-status { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; }
+        .footer-status-dot {
+            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 3px color-mix(in oklab, var(--success) 22%, transparent);
+            animation: pulse 2.4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 3px color-mix(in oklab, var(--success) 22%, transparent); }
+            50% { box-shadow: 0 0 0 7px color-mix(in oklab, var(--success) 0%, transparent); }
+        }
+
+        @media (max-width: 900px) {
+            .footer-main { grid-template-columns: 1fr 1fr; gap: 40px; }
+            .footer-brand { grid-column: 1 / -1; }
+        }
+        @media (max-width: 600px) {
+            .site-footer { padding: 64px 20px 28px; }
+            .footer-main { grid-template-columns: 1fr; gap: 36px; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; text-align: left; }
+        }
+
+        .palette-backdrop {
+            position: fixed; inset: 0; z-index: 200; background: rgba(0, 0, 0, .55);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: flex-start; justify-content: center;
+            padding-top: 14vh; opacity: 0; pointer-events: none; transition: opacity 160ms ease;
+        }
+        .palette-backdrop[hidden] { display: none; }
+        .palette-backdrop.open { opacity: 1; pointer-events: auto; }
+        .palette {
+            width: min(560px, 92vw); max-height: 70vh;
+            background: var(--bg-elev); border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            box-shadow: 0 20px 60px -20px rgba(0, 0, 0, .55);
+            display: flex; flex-direction: column; overflow: hidden;
+            transform: translateY(-8px); transition: transform 160ms ease;
+        }
+        .palette-backdrop.open .palette { transform: translateY(0); }
+        .palette-input-wrap {
+            display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .palette-input-wrap svg { width: 16px; height: 16px; color: var(--fg-subtle); flex-shrink: 0; }
+        .palette-input {
+            flex: 1; height: 24px; padding: 0; border: 0; background: none;
+            color: var(--fg); font: inherit; font-size: 15px; outline: none;
+        }
+        .palette-input::placeholder { color: var(--fg-subtle); }
+        .palette-results { list-style: none; margin: 0; padding: 8px; overflow-y: auto; max-height: calc(70vh - 60px); }
+        .palette-results li {
+            display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+            border-radius: var(--radius-sm); font-size: 14px; cursor: pointer; color: var(--fg-muted);
+        }
+        .palette-results li[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); }
+        .palette-results mark { background: var(--accent-soft); color: var(--accent); padding: 0 1px; border-radius: 2px; }
+        .palette-empty { padding: 24px 16px; text-align: center; font-size: 13px; color: var(--fg-subtle); }
+        .palette-foot {
+            display: flex; gap: 16px; padding: 10px 14px;
+            border-top: 1px solid var(--border); font-size: 11px; color: var(--fg-subtle);
+        }
+        .palette-foot kbd {
+            font-family: var(--mono); font-size: 10px; padding: 1px 5px;
+            border: 1px solid var(--border); border-radius: 3px; color: var(--fg-muted);
+        }
+
+        @media (max-width: 960px) {
+            .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+            .rail {
+                position: fixed; top: var(--header-h); left: 0; bottom: 0; height: auto;
+                width: min(320px, 86vw); padding: 24px 16px;
+                background: var(--bg-elev); border-right: 1px solid var(--border);
+                z-index: 56; overflow-y: auto; transform: translateX(-100%);
+                transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
+                box-shadow: 0 20px 60px -20px rgba(0, 0, 0, .4);
+            }
+            .rail.open { transform: translateX(0); }
+            .rail-backdrop { display: block; pointer-events: none; }
+            .rail-backdrop.open { pointer-events: auto; }
+            .content { padding-top: 32px; }
+            .mobile-menu-toggle { display: inline-flex; }
+        }
+
+        @media (max-width: 767px) {
+            .desktop-nav { display: none; }
+            .container { padding-inline: 16px; }
+            .hero { padding: 64px 20px 56px; }
+            .hero-title { font-size: 36px; }
+            .terminal-body { font-size: 13px; padding: 12px 14px; }
+            .terminal-chrome { padding: 6px 10px; }
+            .terminal-dots { display: none; }
+            .layout { padding-inline: 16px; }
+            .usage-trigger { padding: 14px 16px; gap: 10px; }
+            .usage-desc { display: none; }
+            .usage-panel-content { padding: 0 16px 18px; }
+            .canvas { padding: 12px; border-radius: 12px; margin: 16px 0 22px; }
+            .canvas-window { border-radius: 8px; }
+            .canvas-chrome { padding: 8px 10px; gap: 8px; }
+            .canvas-dots span { width: 9px; height: 9px; }
+            .canvas-code { padding: 16px 18px; font-size: 12px; }
+            .newsletter { padding: 24px; border-radius: 18px; }
+            .nl-head h3 { font-size: 18px; }
+            .nl-head p { font-size: 13.5px; }
+            .nl-form { flex-direction: column; }
+            .nl-submit { width: 100%; height: 48px; }
+            .nl-input { height: 48px; }
+            .table-wrap { font-size: 13px; }
+            .table-wrap th, .table-wrap td { padding: 9px 11px; }
+            .faq-q { padding: 14px 16px; }
+            .faq-a { padding: 0 16px 18px; }
+        }
+
+        @media (max-width: 480px) {
+            .brand span:last-child { display: none; }
+            .footer-brand .brand span:last-child { display: inline; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { transition: none !important; animation: none !important; }
+            .caret { animation: none; opacity: .7; }
+            .footer-status-dot { animation: none; }
+        }
+    </style>
 </head>
 
 <body>
 
-  <a class="visually-hidden" href="#main">Skip to content</a>
+    <a class="skip" href="#main">Skip to content</a>
 
-  <header class="site-header" id="top">
+    <header class="site-header" id="top">
+        <div class="container nav-shell">
+            <a class="brand" href="#top" aria-label="materna home">
+                <span class="brand-mark" aria-hidden="true">M.</span>
+                <span>materna</span>
+            </a>
+            <nav class="desktop-nav" aria-label="Main">
+                <a href="#features">Features</a>
+                <a href="#usage">Usage</a>
+                <a href="#api-probe-node">API</a>
+                <a href="#faq">FAQ</a>
+                <a href="#compatibility">Compatibility</a>
+            </nav>
+            <div class="nav-actions">
+                <a class="star-badge" href="https://github.com/shaonkabir8/materna" target="_blank" rel="noopener noreferrer" aria-label="materna on GitHub">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+                        <path d="M9 18c-4.51 2-5-2-7-2"></path>
+                    </svg>
+                    <span aria-hidden="true">★</span>
+                </a>
+                <a class="npm-link" href="https://www.npmjs.com/package/materna" target="_blank" rel="noopener noreferrer" aria-label="materna on npm">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M0 7.5h24v9H12v1.5H6v-1.5H0v-9Zm1.5 1.5v6H4.5v-4.5h1.5v4.5H7.5v-6h-6Zm9 0v6H15v-4.5h-1.5v4.5H12v-6h-1.5Zm7.5 0v6h1.5v-4.5H21v4.5h1.5v-6h-4.5Z" />
+                    </svg>
+                    npm
+                </a>
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Toggle appearance">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                    </svg>
+                </button>
+                <button class="mobile-menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="rail" aria-label="Open documentation navigation">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                        <path d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
 
-    <div class="container nav-shell">
-
-      <a class="brand" href="#top" aria-label="Materna home">
-        <span class="brand-mark" aria-hidden="true">M.</span>
-        <span>materna</span>
-      </a>
-
-      <nav class="desktop-nav" aria-label="Main">
-        <a href="https://github.com/shaonkabir8/materna#readme">Docs</a>
-        <a href="https://github.com/shaonkabir8/materna#-quick-start">Quick start</a>
-        <a href="https://github.com/shaonkabir8/materna#-api-reference">API</a>
-        <a href="https://github.com/shaonkabir8/materna#-limitations--compatibility">Compatibility</a>
-      </nav>
-
-      <div class="nav-actions">
-
-        <a
-          class="star-badge"
-          href="https://github.com/shaonkabir8/materna"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Materna on GitHub"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
-            <path d="M9 18c-4.51 2-5-2-7-2"/>
-          </svg>
-          <span aria-hidden="true">★</span>
-        </a>
-
-        <a
-          class="sponsor-link"
-          href="https://github.com/sponsors/shaonkabir8"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-          </svg>
-          Sponsor
-        </a>
-
-        <button
-          class="theme-toggle"
-          id="themeToggle"
-          type="button"
-          aria-label="Switch to dark mode"
-          title="Toggle appearance"
-        >
-          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="4"/>
-            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
-          </svg>
-
-          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
-          </svg>
-        </button>
-
-        <button
-          class="mobile-menu-toggle"
-          id="menuToggle"
-          type="button"
-          aria-expanded="false"
-          aria-controls="mobileNav"
-          aria-label="Open navigation"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-            <path d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-
-      </div>
-
-    </div>
-
-    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation" hidden>
-      <a href="https://github.com/shaonkabir8/materna#readme">Docs</a>
-      <a href="https://github.com/shaonkabir8/materna#-quick-start">Quick start</a>
-      <a href="https://github.com/shaonkabir8/materna#-api-reference">API</a>
-      <a href="https://github.com/shaonkabir8/materna#-limitations--compatibility">Compatibility</a>
-      <a href="https://github.com/sponsors/shaonkabir8">Sponsor</a>
-    </nav>
-
-  </header>
-
-
-  <main id="main">
-
-    <!-- Hero -->
-    <section class="hero">
-
-      <div class="container hero-inner">
-
-        <a class="hero-badge" href="https://www.npmjs.com/package/materna">
-          v0.1.0 — now on npm
-          <span class="badge-arrow" aria-hidden="true">→</span>
-        </a>
-
+    <section class="hero" id="intro">
+        <span class="eyebrow">
+            <span class="dot" aria-hidden="true"></span>
+            v0.1.0 · now on npm · MIT · Node ≥ 22
+        </span>
         <h1 class="hero-title">Behavior is the evidence</h1>
-
-        <p class="hero-description">
-          Behavioral locale parity probing for Node.js and PostgreSQL.
-          Versions are metadata. Observed behavior is evidence.
+        <p class="hero-lede">
+            <strong>Versions are metadata. Observed behavior is evidence.</strong> materna compares SHA-256 digests of what Node.js <code>Intl.Collator</code> and PostgreSQL <code>ORDER BY</code> actually do — not what their version strings claim.
         </p>
 
-        <div class="install-box">
-
-          <div class="install-top">
-
-            <svg class="pkg-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M0 0v7.5h7.5V0zm8.25 0v7.5h7.498V0zm8.25 0v7.5H24V0zM8.25 8.25v7.5h7.498v-7.5zm8.25 0v7.5H24v-7.5zM0 16.5V24h7.5v-7.5zm8.25 0V24h7.498v-7.5zm8.25 0V24H24v-7.5z"/>
-            </svg>
-
-            <div class="pkg-tab-group" role="tablist" aria-label="Install method">
-
-              <button class="pkg-tab" id="tab-bun" role="tab" aria-selected="false" aria-controls="install-command" data-cmd="bun add materna">bun</button>
-
-              <button class="pkg-tab" id="tab-npm" role="tab" aria-selected="true" aria-controls="install-command" data-cmd="npm install materna">npm</button>
-
-              <button class="pkg-tab" id="tab-pnpm" role="tab" aria-selected="false" aria-controls="install-command" data-cmd="pnpm add materna">pnpm</button>
-
-              <button class="pkg-tab" id="tab-yarn" role="tab" aria-selected="false" aria-controls="install-command" data-cmd="yarn add materna">yarn</button>
-
+        <div class="terminal" role="region" aria-label="Install materna">
+            <div class="terminal-chrome">
+                <div class="terminal-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                <div class="pkg-tabs" role="tablist" aria-label="Package manager">
+                    <button class="pkg-tab" id="tab-bun" role="tab" aria-selected="false" aria-controls="terminal-body" data-cmd="bun add materna" tabindex="-1">bun</button>
+                    <button class="pkg-tab" id="tab-npm" role="tab" aria-selected="true" aria-controls="terminal-body" data-cmd="npm install materna" tabindex="0">npm</button>
+                    <button class="pkg-tab" id="tab-pnpm" role="tab" aria-selected="false" aria-controls="terminal-body" data-cmd="pnpm add materna" tabindex="-1">pnpm</button>
+                    <button class="pkg-tab" id="tab-yarn" role="tab" aria-selected="false" aria-controls="terminal-body" data-cmd="yarn add materna" tabindex="-1">yarn</button>
+                </div>
+                <div class="terminal-actions" id="copyWrap">
+                    <button class="icon-btn" id="copyInstall" type="button" aria-label="Copy install command">
+                        <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="9" y="9" width="12" height="12" rx="2" />
+                            <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+                        </svg>
+                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                    </button>
+                </div>
+                <span class="visually-hidden" id="copyStatus" role="status" aria-live="polite"></span>
             </div>
-
-            <div class="install-actions">
-
-              <a
-                class="install-action install-action-labeled"
-                href="https://www.npmjs.com/package/materna"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="View Materna on npm"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M5 12h14M12 5v14"/>
-                </svg>
-                <span>npm</span>
-              </a>
-
-              <button
-                class="install-action"
-                id="copyInstall"
-                type="button"
-                aria-label="Copy install command"
-              >
-                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-                </svg>
-                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M20 6 9 17l-5-5"/>
-                </svg>
-              </button>
-
+            <div class="terminal-body" id="terminal-body" role="tabpanel" aria-labelledby="tab-npm" tabindex="0">
+                <span class="prompt" aria-hidden="true"><span class="arrow">➜</span><span class="path">~</span></span>
+                <span class="typed" id="typed"></span><span class="caret" aria-hidden="true"></span>
+                <noscript><code style="color:var(--fg)">npm install materna</code></noscript>
             </div>
-
-            <span class="visually-hidden" id="copyStatus" role="status" aria-live="polite"></span>
-
-          </div>
-
-          <code class="install-command" id="install-command" role="tabpanel" aria-labelledby="tab-npm"><span class="dollar" aria-hidden="true">$ </span><span class="cmd-dim">npm install </span><span class="cmd-pkg">materna</span></code>
-
         </div>
 
         <div class="hero-actions">
-
-          <a class="button button-primary" href="https://github.com/shaonkabir8/materna#-quick-start">
-            Get Started
-          </a>
-
-          <a class="button button-secondary" href="https://github.com/shaonkabir8/materna#-api-reference">
-            Browse the API
-          </a>
-
+            <a class="button button-primary" href="#usage">Get Started</a>
+            <a class="button button-secondary" href="#api-probe-node">Browse the API</a>
         </div>
 
         <button class="agent-copy" id="agentCopy" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-          </svg>
-          <span data-agent-label>Copy prompt for your agent</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+            </svg>
+            <span data-agent-label>Copy prompt for your agent</span>
         </button>
-
-      </div>
-
     </section>
 
+    <div class="layout">
+        <div class="rail-backdrop" id="railBackdrop" aria-hidden="true"></div>
 
-    <!-- Showcase -->
-    <section class="showcase" aria-label="Materna at a glance">
+        <aside class="rail" id="rail" aria-label="Documentation navigation">
+            <nav>
+                <div class="rail-group">
+                    <h4>Getting started</h4>
+                    <ul class="rail-list">
+                        <li><a href="#intro">Introduction</a></li>
+                        <li><a href="#features">Features</a></li>
+                    </ul>
+                </div>
+                <div class="rail-group">
+                    <h4>Examples</h4>
+                    <ul class="rail-list">
+                        <li><a href="#usage">Usage</a></li>
+                    </ul>
+                </div>
+                <div class="rail-group">
+                    <h4>Reference</h4>
+                    <ul class="rail-list">
+                        <li><a href="#api-probe-node">probeNode()</a></li>
+                        <li><a href="#api-probe-postgres">probePostgres()</a></li>
+                        <li><a href="#api-compare">compareObservations()</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#compatibility">Compatibility</a></li>
+                    </ul>
+                </div>
+                <div class="rail-group">
+                    <h4>Community</h4>
+                    <ul class="rail-list">
+                        <li><a href="#community">Community</a></li>
+                        <li><a href="#newsletter">Newsletter</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
 
-      <div class="container showcase-grid">
+        <main id="main" class="content">
 
-        <article class="showcase-card">
+            <section class="section" id="features" data-section>
+                <div class="sec-meta">02 · Capabilities</div>
+                <h2>✦ Features</h2>
+                <p class="sec-lead">Everything a locale-parity test suite needs — nothing it doesn't.</p>
+                <div class="fgrid">
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">⚙</span>
+                            <h3>Zero-config probing</h3>
+                        </div>
+                        <p><code>npx materna node</code> works instantly — no config file, no init step.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">🌐</span>
+                            <h3>Database &amp; runtime parity</h3>
+                        </div>
+                        <p>Natively probes Node.js <code>Intl.Collator</code> and PostgreSQL <code>ORDER BY</code> against the same corpus.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">📄</span>
+                            <h3>Deterministic HTML reports</h3>
+                        </div>
+                        <p><code>materna report.html</code> emits reviewable, diffable HTML with zero JavaScript inside.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">🔬</span>
+                            <h3>E3/E1 evidence levels</h3>
+                        </div>
+                        <p>Clearly separates "executed here" from "configured in CI" — no ambiguity in the report.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">🚦</span>
+                            <h3>Strict exit codes</h3>
+                        </div>
+                        <p>CI-friendly: <code>0</code>=PASS, <code>1</code>=DIFFERENCE, <code>2</code>=INCONCLUSIVE, <code>3</code>=ERROR.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">🔗</span>
+                            <h3>Tie-structure aware</h3>
+                        </div>
+                        <p>Detects subtle differences in equality groups, not just ordering — where collation bugs hide.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">📦</span>
+                            <h3>Single runtime dependency</h3>
+                        </div>
+                        <p><code>pg</code> is dynamically imported — <code>import 'materna'</code> loads no database driver.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">🔒</span>
+                            <h3>Zero hosted control plane</h3>
+                        </div>
+                        <p>Runs entirely on your machine or CI. No SaaS, no telemetry, no account.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="fcard-head"><span class="ico">🧬</span>
+                            <h3>Immutable corpus</h3>
+                        </div>
+                        <p>Samples are hashed and verified. Tampering is refused — every verdict is reproducible.</p>
+                    </div>
+                </div>
+            </section>
 
-          <span class="card-tag">PARITY PROBE</span>
+            <section class="section" id="usage" data-section>
+                <div class="sec-meta">03 · Examples</div>
+                <h2>⌨ Usage</h2>
+                <p class="usage-intro">Two entry points for the same engine. Expand one, copy the snippet.</p>
 
-          <h2>Same input.<br>Two observations.</h2>
+                <div class="usage-accordion" role="region" aria-label="Usage examples">
 
-          <p>
-            Node.js <code>Intl.Collator</code> and PostgreSQL <code>ORDER BY</code>,
-            probed over an immutable corpus and fingerprinted with SHA-256.
-          </p>
+                    <div class="usage-item">
+                        <button class="usage-trigger" type="button" id="usage-t-1" aria-expanded="true" aria-controls="usage-p-1">
+                            <span class="usage-num">01</span>
+                            <span class="usage-title">CLI (Zero Code)</span>
+                            <span class="usage-desc">npx · no config</span>
+                            <svg class="usage-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="usage-panel open" id="usage-p-1" role="region" aria-labelledby="usage-t-1">
+                            <div class="usage-panel-inner">
+                                <div class="usage-panel-content">
+                                    <div class="canvas">
+                                        <div class="canvas-window">
+                                            <div class="canvas-chrome">
+                                                <div class="canvas-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                                                <span class="canvas-filename">terminal</span>
+                                                <button class="canvas-copy" data-copy-target="code-cli" aria-label="Copy CLI example">
+                                                    <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                        <rect x="9" y="9" width="12" height="12" rx="2" />
+                                                        <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+                                                    </svg>
+                                                    <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                        <path d="M20 6 9 17l-5-5" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <pre class="canvas-code"><code id="code-cli"><span class="tok-com"># Probe Node.js runtime</span>
+npx materna node --json &gt; node.json
 
-          <span class="card-chip">materna</span>
+<span class="tok-com"># Probe PostgreSQL (DATABASE_URL is honored)</span>
+DATABASE_URL=<span class="tok-str">'postgresql://postgres:postgres@localhost:5432/localeparity'</span> \
+  npx materna postgres --json &gt; pg.json
 
-        </article>
+<span class="tok-com"># Compare the two observations</span>
+npx materna compare --left node.json --right pg.json</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        <article class="showcase-card card-quote">
+                    <div class="usage-item">
+                        <button class="usage-trigger" type="button" id="usage-t-2" aria-expanded="false" aria-controls="usage-p-2">
+                            <span class="usage-num">02</span>
+                            <span class="usage-title">API (Programmatic)</span>
+                            <span class="usage-desc">import · async</span>
+                            <svg class="usage-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="usage-panel" id="usage-p-2" role="region" aria-labelledby="usage-t-2">
+                            <div class="usage-panel-inner">
+                                <div class="usage-panel-content">
+                                    <div class="canvas">
+                                        <div class="canvas-window">
+                                            <div class="canvas-chrome">
+                                                <div class="canvas-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                                                <span class="canvas-filename">index.mjs</span>
+                                                <button class="canvas-copy" data-copy-target="code-api" aria-label="Copy API example">
+                                                    <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                        <rect x="9" y="9" width="12" height="12" rx="2" />
+                                                        <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+                                                    </svg>
+                                                    <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                        <path d="M20 6 9 17l-5-5" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <pre class="canvas-code"><code id="code-api"><span class="tok-kw">import</span> { probeNode, probePostgres, compareObservations } <span class="tok-kw">from</span> <span class="tok-str">'materna'</span>;
 
-          <span class="card-quote-mark" aria-hidden="true">«</span>
+<span class="tok-kw">const</span> left <span class="tok-op">=</span> <span class="tok-fn">probeNode</span>({ locale: <span class="tok-str">'de-DE'</span> });
+<span class="tok-kw">const</span> right <span class="tok-op">=</span> <span class="tok-kw">await</span> <span class="tok-fn">probePostgres</span>({
+  locale: <span class="tok-str">'de-DE'</span>,
+  connectionString: process.env.DATABASE_URL,
+});
 
-          <h2>Versions are metadata.<br>Observed behavior is evidence.</h2>
+<span class="tok-kw">const</span> outcome <span class="tok-op">=</span> <span class="tok-fn">compareObservations</span>(left, right);
 
-          <div class="quote-attribution">
+<span class="tok-kw">if</span> (outcome.status <span class="tok-op">===</span> <span class="tok-str">'DIFFERENCE'</span>) {
+  <span class="tok-com">// inspect outcome.first_difference for the exact index</span>
+}</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <span class="quote-avatar" aria-hidden="true">MT</span>
+                </div>
+            </section>
 
-            <span>
-              <span class="quote-name">Materna</span><br>
-              <span class="quote-sub">Behavioral locale parity probing</span>
-            </span>
+            <section class="section" id="api-probe-node" data-section>
+                <div class="sec-meta">03 · Reference</div>
+                <h2>ƒ probeNode(options)</h2>
+                <p class="sec-lead">Synchronously returns an observation of Node.js <code>Intl.Collator</code> behavior. Works in Node, Bun, and Deno.</p>
+                <table class="api-table">
+                    <thead>
+                        <tr><th>Option</th><th>Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>locale</td><td>string</td><td>BCP 47 locale tag, e.g. <code>'de-DE'</code>.</td></tr>
+                        <tr><td>sensitivity</td><td>string</td><td><code>'base'</code>, <code>'accent'</code>, <code>'case'</code>, or <code>'variant'</code>.</td></tr>
+                        <tr><td>numeric</td><td>boolean</td><td>Enable numeric collation.</td></tr>
+                        <tr><td>corpus</td><td>array</td><td>Optional custom corpus. Defaults to the immutable built-in corpus.</td></tr>
+                    </tbody>
+                </table>
+                <div class="callout"><span class="ic">✓</span>
+                    <div><strong>Return value.</strong> A collation observation object. The fingerprint is a SHA-256 digest over the sorted corpus — every byte is auditable.</div>
+                </div>
+            </section>
 
-          </div>
+            <section class="section" id="api-probe-postgres" data-section>
+                <div class="sec-meta">03.1 · Reference</div>
+                <h2>ƒ probePostgres(options)</h2>
+                <p class="sec-lead">Asynchronously probes PostgreSQL <code>ORDER BY</code> behavior. Requires a live connection.</p>
+                <table class="api-table">
+                    <thead>
+                        <tr><th>Option</th><th>Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>connectionString</td><td>string</td><td>PostgreSQL connection URL. Honored from <code>DATABASE_URL</code> in the CLI.</td></tr>
+                        <tr><td>locale</td><td>string</td><td>BCP 47 locale tag, e.g. <code>'de-DE'</code>.</td></tr>
+                    </tbody>
+                </table>
+                <div class="callout"><span class="ic">⚠</span>
+                    <div><strong>No silent fallback.</strong> If the connection fails, <code>probePostgres</code> throws. The caller decides whether to skip or fail — no hidden retry, no empty result.</div>
+                </div>
+            </section>
 
-        </article>
+            <section class="section" id="api-compare" data-section>
+                <div class="sec-meta">03.2 · Reference</div>
+                <h2>ƒ compareObservations(left, right, [opts])</h2>
+                <p class="sec-lead">Compares two observations and returns a single outcome object.</p>
+                <table class="api-table">
+                    <thead>
+                        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>status</td><td>string</td><td><code>'PASS'</code>, <code>'DIFFERENCE'</code>, or <code>'INCONCLUSIVE'</code>.</td></tr>
+                        <tr><td>first_difference</td><td>object</td><td>Exact index and values where the two orderings diverge. Present only when status is <code>DIFFERENCE</code>.</td></tr>
+                        <tr><td>metadata_differences</td><td>array</td><td>Environment differences (e.g. ICU version) that do <strong>not</strong> cause a failure.</td></tr>
+                    </tbody>
+                </table>
+                <div class="callout"><span class="ic">✓</span>
+                    <div><strong>INCONCLUSIVE is not a failure.</strong> When either observation is <code>null</code> or missing, the comparison aborts safely with exit code <code>2</code>. Nothing is proven either way.</div>
+                </div>
+            </section>
 
-        <article class="showcase-card card-command">
+            <section class="section" id="faq" data-section>
+                <div class="sec-meta">04 · FAQ</div>
+                <h2>❓ Frequently asked questions</h2>
+                <p class="sec-lead">Each answer comes with an animated flowchart of the same logic. Open a question to see it.</p>
+                <div class="faq-group" id="faq-list"></div>
+            </section>
 
-          <h2>Compare in one command</h2>
+            <section class="section" id="compatibility" data-section>
+                <div class="sec-meta">05 · Compatibility</div>
+                <h2>⇄ Compatibility &amp; why materna</h2>
+                <p class="sec-lead">Versions are metadata. Observed behavior is evidence. materna declares a mismatch only when two runs over the same declared probe and corpus produce different observed orderings.</p>
 
-          <div class="command-line"><span class="dollar" aria-hidden="true">$ </span>npx materna compare \
-  --left node.json \
-  --right pg.json</div>
+                <h3>Why materna?</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>The Old Way (Version Metadata)</th>
+                                <th>The New Way (Behavioral Evidence)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>You check <code>process.versions.icu === '78.3'</code> and assume compatibility.</td>
+                                <td>You run <code>probeNode()</code> and <code>probePostgres()</code>, then compare their actual observed orderings.</td>
+                            </tr>
+                            <tr>
+                                <td>An ICU or glibc update silently breaks sorting.</td>
+                                <td>materna fingerprints the actual collation output with SHA-256.</td>
+                            </tr>
+                            <tr>
+                                <td>You find out in production when <code>ORDER BY</code> mismatches.</td>
+                                <td>You find out in your test suite, with a precise <code>first_difference</code>.</td>
+                            </tr>
+                            <tr>
+                                <td>"We use PostgreSQL 16 and Node 22, so it should be fine."</td>
+                                <td>"We proved the exact <code>de-DE</code> corpus produces identical orderings and tie structures."</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-          <p>
-            Strict exit codes: 0 PASS, 1 DIFFERENCE,
-            2 INCONCLUSIVE, 3 ERROR — CI-friendly by design.
-          </p>
+                <h3>Runtime compatibility</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Runtime</th><th>Supported</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Node.js 22</td><td><span class="yes">Yes</span></td></tr>
+                            <tr><td>Node.js 24</td><td><span class="yes">Yes</span></td></tr>
+                            <tr><td>Node.js 26</td><td><span class="yes">Yes</span></td></tr>
+                            <tr><td>Bun</td><td><span class="yes">Yes</span></td></tr>
+                            <tr><td>Deno</td><td><span class="yes">Yes</span></td></tr>
+                            <tr><td>PostgreSQL 16.15 (optional)</td><td><span class="yes">Yes</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
 
-          <span class="card-chip">materna</span>
+                <h3>Notes</h3>
+                <ul>
+                    <li>Node.js ≥ 22 is required for the CLI.</li>
+                    <li>PostgreSQL is optional — only needed for <code>materna postgres</code>.</li>
+                    <li>The corpus is immutable. Samples are hashed and verified; tampering is refused.</li>
+                    <li>Exit codes are strict and CI-friendly: <code>0</code>=PASS, <code>1</code>=DIFFERENCE, <code>2</code>=INCONCLUSIVE, <code>3</code>=ERROR.</li>
+                </ul>
+            </section>
 
-        </article>
+            <section class="section" id="community" data-section>
+                <div class="sec-meta">06 · Community</div>
+                <h2>💬 Community</h2>
+                <p class="sec-lead">GitHub Issues is the support channel. Pull requests are welcome; so are stars and sponsors.</p>
 
-        <article class="showcase-card card-report">
+                <div class="contrib">
+                    <a href="https://github.com/shaonkabir8/materna/issues" target="_blank" rel="noopener"><span class="ico">🐛</span> Issues</a>
+                    <a href="https://github.com/shaonkabir8/materna/pulls" target="_blank" rel="noopener"><span class="ico">🔀</span> Pull requests</a>
+                    <a href="https://github.com/shaonkabir8/materna" target="_blank" rel="noopener"><span class="ico">⭐</span> Star on GitHub</a>
+                    <a href="https://github.com/sponsors/shaonkabir8" target="_blank" rel="noopener"><span class="ico">💖</span> Sponsor</a>
+                </div>
 
-          <h2>Deterministic HTML reports</h2>
+                <div class="callout" style="margin-top:1rem"><span class="ic">💡</span>
+                    <div><strong>Built and maintained in the open.</strong> materna has no hosted control plane and no SaaS tier — contributions go straight into the OSS engine.</div>
+                </div>
+            </section>
 
-          <div class="report-mock" role="img" aria-label="Mock-up of a Materna HTML comparison report showing a DIFFERENCE status and the first differing position">
+            <section class="section newsletter-section" id="newsletter" data-section>
+                <div class="sec-meta">07 · Newsletter</div>
+                <h2>✉ Release notes</h2>
+                <p class="sec-lead">One email per release. Corpus syncs, version bumps, and the occasional behind-the-scenes note — nothing else.</p>
 
-            <div class="report-bar">
-              <span class="report-title">materna report.html</span>
-              <span class="report-status difference">DIFFERENCE</span>
-            </div>
+                <div class="newsletter">
+                    <div class="nl-head">
+                        <span class="nl-badge" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="4" width="20" height="16" rx="2" />
+                                <path d="m2 7 10 6 10-6" />
+                            </svg>
+                        </span>
+                        <div>
+                            <h3>Get the release notes</h3>
+                            <p>No spam. One-click unsubscribe. Never sold or shared. Double opt-in, one email per release.</p>
+                        </div>
+                    </div>
 
-            <div class="report-row">
-              <span>first_difference</span>
-              <strong>index 1 · "ä" vs "å"</strong>
-            </div>
+                    <form class="nl-form" id="nlForm" action="https://buttondown.com/api/emails/embed-subscribe/BUTTONDOWN_USERNAME" method="post" target="_blank" novalidate>
+                        <div class="nl-field">
+                            <input class="nl-input" id="nlEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder=" " required aria-describedby="nlStatus">
+                            <label class="nl-label" for="nlEmail">you@example.com</label>
+                        </div>
+                        <button class="nl-submit" id="nlSubmit" type="submit">
+                            <span>Join the materna family</span>
+                            <svg class="nl-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14M13 6l6 6-6 6" />
+                            </svg>
+                            <svg class="nl-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5" />
+                            </svg>
+                        </button>
+                    </form>
 
-            <div class="report-row">
-              <span>corpus</span>
-              <strong>collation-core-v1 · 16 samples</strong>
-            </div>
+                    <p class="nl-status" id="nlStatus" role="status" aria-live="polite"></p>
 
-            <div class="report-bars" aria-hidden="true">
-              <span></span><span></span><span class="mismatch"></span><span></span>
-              <span></span><span></span><span></span><span></span>
-              <span></span><span class="mismatch"></span><span></span><span></span>
-            </div>
+                    <ul class="nl-trust">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>No spam, ever</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>One-click unsubscribe</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Never sold or shared</li>
+                    </ul>
+                </div>
+            </section>
 
-          </div>
-
-          <div class="report-note">
-            <span>Illustrative layout</span>
-            <span>No JavaScript in real reports</span>
-          </div>
-
-        </article>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <footer class="site-footer">
-
-    <div class="container">
-
-      <p class="footer-line">
-        Built by <a href="https://github.com/shaonkabir8" target="_blank" rel="noopener noreferrer">Shaon Kabir</a>.
-        The source code is available on <a href="https://github.com/shaonkabir8/materna" target="_blank" rel="noopener noreferrer">GitHub</a>.
-      </p>
-
+        </main>
     </div>
 
-  </footer>
+    <footer class="site-footer">
+        <div class="footer-main">
+            <div class="footer-brand">
+                <a class="brand" href="#top" aria-label="materna home">
+                    <span class="brand-mark" aria-hidden="true">M.</span>
+                    <span>materna</span>
+                </a>
+                <p class="footer-tagline">Behavioral locale parity probing for Node.js and PostgreSQL. Versions are metadata. Observed behavior is evidence. MIT licensed.</p>
+                <div class="footer-socials">
+                    <a href="https://github.com/shaonkabir8/materna" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 .5C5.73.5.5 5.73.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.74.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.71 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 2.9-.39c.98 0 1.97.13 2.9.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.44-2.7 5.42-5.27 5.71.41.35.78 1.05.78 2.12v3.14c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z" />
+                        </svg>
+                    </a>
+                    <a href="https://www.npmjs.com/package/materna" target="_blank" rel="noopener noreferrer" aria-label="npm package">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M0 7.5h24v9H12v1.5H6v-1.5H0v-9Zm1.5 1.5v6H4.5v-4.5h1.5v4.5H7.5v-6h-6Zm9 0v6H15v-4.5h-1.5v4.5H12v-6h-1.5Zm7.5 0v6h1.5v-4.5H21v4.5h1.5v-6h-4.5Z" />
+                        </svg>
+                    </a>
+                    <a href="https://github.com/shaonkabir8/materna/issues" target="_blank" rel="noopener noreferrer" aria-label="GitHub Issues">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
 
+            <nav class="footer-col" aria-label="Product">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#usage">Usage examples</a></li>
+                    <li><a href="#api-probe-node">API reference</a></li>
+                    <li><a href="#compatibility">Compatibility</a></li>
+                </ul>
+            </nav>
 
-  <script>
-    (function () {
-      'use strict';
+            <nav class="footer-col" aria-label="Resources">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="./llms.txt">llms.txt</a></li>
+                    <li><a href="./robots.txt">robots.txt</a></li>
+                    <li><a href="./sitemap.xml">sitemap.xml</a></li>
+                    <li><a href="https://github.com/shaonkabir8/materna#license">License (MIT)</a></li>
+                </ul>
+            </nav>
 
-      var root = document.documentElement;
+            <nav class="footer-col" aria-label="Community">
+                <h4>Community</h4>
+                <ul>
+                    <li><a href="#community">Community</a></li>
+                    <li><a href="#newsletter">Newsletter</a></li>
+                    <li><a href="https://github.com/shaonkabir8/materna/issues" target="_blank" rel="noopener noreferrer">Issues</a></li>
+                    <li><a href="https://github.com/shaonkabir8/materna/pulls" target="_blank" rel="noopener noreferrer">Pull requests</a></li>
+                </ul>
+            </nav>
+        </div>
 
-      /* Theme */
+        <div class="footer-bottom">
+            <p>© 2025 materna · Built by <a href="https://github.com/shaonkabir8" target="_blank" rel="noopener noreferrer">Shaon Kabir</a> · MIT licensed.</p>
+            <div class="footer-status">
+                <span class="footer-status-dot" aria-hidden="true"></span>
+                <span>All systems operational</span>
+            </div>
+        </div>
+    </footer>
 
-      var themeToggle = document.getElementById('themeToggle');
+    <div class="scroll-cta" id="scrollCta" aria-hidden="true">
+        <button type="button" class="scroll-up" id="scrollUp" aria-label="Scroll to top" title="Scroll to top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6" /></svg>
+        </button>
+        <div class="scroll-cta-divider" aria-hidden="true"></div>
+        <button type="button" class="scroll-down" id="scrollDown" aria-label="Scroll to bottom" title="Scroll to bottom">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+        </button>
+    </div>
 
-      function applyTheme(theme) {
-        root.setAttribute('data-theme', theme);
-        root.classList.toggle('dark', theme === 'dark');
-        root.classList.toggle('light', theme === 'light');
-        themeToggle.setAttribute(
-          'aria-label',
-          theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
-        );
-      }
+    <div class="palette-backdrop" id="paletteBackdrop" hidden>
+        <div class="palette" role="dialog" aria-modal="true" aria-labelledby="paletteTitle">
+            <h2 id="paletteTitle" class="visually-hidden">Search documentation</h2>
+            <div class="palette-input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input class="palette-input" id="paletteInput" type="text" placeholder="Search docs… (⌘K)" autocomplete="off" spellcheck="false" aria-controls="paletteResults" aria-autocomplete="list">
+            </div>
+            <ul class="palette-results" id="paletteResults" role="listbox"></ul>
+            <div class="palette-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+                <span><kbd>↵</kbd> Jump</span>
+                <span><kbd>esc</kbd> Close</span>
+            </div>
+        </div>
+    </div>
 
-      var stored = null;
-      try { stored = localStorage.getItem('materna-theme'); } catch (error) { /* unavailable */ }
+    <script>
+        (function() {
+            'use strict';
 
-      applyTheme(stored === 'dark' ? 'dark' : 'light');
+            var root = document.documentElement;
+            var prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      themeToggle.addEventListener('click', function () {
-        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
-        try { localStorage.setItem('materna-theme', next); } catch (error) { /* unavailable */ }
-      });
+            /* Theme */
+            var themeToggle = document.getElementById('themeToggle');
 
-      /* Mobile navigation */
+            function applyTheme(t) {
+                root.setAttribute('data-theme', t);
+                var meta = document.querySelector('meta[name="theme-color"]');
+                if (meta) meta.setAttribute('content', t === 'dark' ? '#08080c' : '#fafafa');
+                themeToggle.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+            }
+            var savedTheme = null;
+            try { savedTheme = localStorage.getItem('materna-theme'); } catch (e) {}
+            applyTheme(savedTheme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+            themeToggle.addEventListener('click', function() {
+                var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+                try { localStorage.setItem('materna-theme', next); } catch (e) {}
+            });
+            matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(ev) {
+                try { if (localStorage.getItem('materna-theme')) return; } catch (e) {}
+                applyTheme(ev.matches ? 'dark' : 'light');
+            });
 
-      var menuToggle = document.getElementById('menuToggle');
-      var mobileNav = document.getElementById('mobileNav');
+            /* Mobile rail drawer */
+            var menuToggle = document.getElementById('menuToggle');
+            var rail = document.getElementById('rail');
+            var railBackdrop = document.getElementById('railBackdrop');
 
-      menuToggle.addEventListener('click', function () {
-        var open = !mobileNav.hidden;
-        mobileNav.hidden = open;
-        menuToggle.setAttribute('aria-expanded', String(!open));
-        menuToggle.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation');
-      });
+            function isMobile() { return window.matchMedia('(max-width: 960px)').matches; }
 
-      mobileNav.addEventListener('click', function (event) {
-        if (event.target.closest('a')) {
-          mobileNav.hidden = true;
-          menuToggle.setAttribute('aria-expanded', 'false');
-        }
-      });
+            function setRail(open) {
+                if (!isMobile()) return;
+                rail.classList.toggle('open', open);
+                railBackdrop.classList.toggle('open', open);
+                menuToggle.setAttribute('aria-expanded', String(open));
+                menuToggle.setAttribute('aria-label', open ? 'Close documentation navigation' : 'Open documentation navigation');
+                document.body.style.overflow = open ? 'hidden' : '';
+            }
+            menuToggle.addEventListener('click', function() { setRail(!rail.classList.contains('open')); });
+            railBackdrop.addEventListener('click', function() { setRail(false); });
+            rail.addEventListener('click', function(ev) { if (ev.target.closest('a') && isMobile()) setRail(false); });
+            document.addEventListener('keydown', function(ev) { if (ev.key === 'Escape' && rail.classList.contains('open')) setRail(false); });
+            window.addEventListener('resize', function() {
+                if (!isMobile() && rail.classList.contains('open')) {
+                    rail.classList.remove('open');
+                    railBackdrop.classList.remove('open');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                    document.body.style.overflow = '';
+                }
+            });
 
-      /* Clipboard helpers
-         Feedback is only ever shown once the outcome of the write is
-         known. A rejected async write falls back to the legacy path,
-         whose boolean return value is also checked. */
+            /* Usage accordion */
+            (function() {
+                var items = Array.prototype.slice.call(document.querySelectorAll('.usage-item'));
+                if (!items.length) return;
+                items.forEach(function(item) {
+                    var trigger = item.querySelector('.usage-trigger');
+                    var panel = item.querySelector('.usage-panel');
+                    trigger.addEventListener('click', function() {
+                        var isOpen = trigger.getAttribute('aria-expanded') === 'true';
+                        items.forEach(function(other) {
+                            var ot = other.querySelector('.usage-trigger');
+                            var op = other.querySelector('.usage-panel');
+                            ot.setAttribute('aria-expanded', 'false');
+                            op.classList.remove('open');
+                        });
+                        if (!isOpen) {
+                            trigger.setAttribute('aria-expanded', 'true');
+                            panel.classList.add('open');
+                        }
+                    });
+                    trigger.addEventListener('keydown', function(ev) {
+                        var i = items.indexOf(item);
+                        var next = null;
+                        if (ev.key === 'ArrowDown') next = items[(i + 1) % items.length];
+                        else if (ev.key === 'ArrowUp') next = items[(i - 1 + items.length) % items.length];
+                        else if (ev.key === 'Home') next = items[0];
+                        else if (ev.key === 'End') next = items[items.length - 1];
+                        if (next) { ev.preventDefault(); next.querySelector('.usage-trigger').focus(); }
+                    });
+                });
+            })();
 
-      function legacyCopy(text) {
-        var area = document.createElement('textarea');
-        area.value = text;
-        area.setAttribute('readonly', '');
-        area.style.position = 'fixed';
-        area.style.top = '-9999px';
-        document.body.appendChild(area);
+            /* Clipboard */
+            function legacyCopy(text) {
+                return new Promise(function(resolve, reject) {
+                    var ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.setAttribute('readonly', '');
+                    ta.style.position = 'fixed';
+                    ta.style.top = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try {
+                        var ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        ok ? resolve() : reject(new Error('copy failed'));
+                    } catch (e) {
+                        document.body.removeChild(ta);
+                        reject(e);
+                    }
+                });
+            }
 
-        var copied = false;
-        try {
-          area.select();
-          copied = document.execCommand('copy');
-        } catch (error) {
-          copied = false;
-        }
+            function copyText(text) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    return navigator.clipboard.writeText(text).catch(function() { return legacyCopy(text); });
+                }
+                return legacyCopy(text);
+            }
 
-        document.body.removeChild(area);
-        return copied;
-      }
+            /* Install terminal */
+            (function() {
+                var tabs = Array.prototype.slice.call(document.querySelectorAll('.pkg-tab'));
+                var typed = document.getElementById('typed');
+                var panel = document.getElementById('terminal-body');
+                if (!typed || !tabs.length) return;
 
-      function copyText(text) {
-        return new Promise(function (resolve) {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(
-              function () { resolve(true); },
-              function () { resolve(legacyCopy(text)); }
-            );
-            return;
-          }
-          resolve(legacyCopy(text));
-        });
-      }
+                var current = 'npm install materna';
+                var typeTimer = null;
 
-      /* Install tabs + copy */
+                function typeCommand(cmd, animate) {
+                    current = cmd;
+                    if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
+                    typed.textContent = '';
+                    if (!animate || prefersReduced) { typed.textContent = cmd; return; }
+                    var i = 0;
+                    (function step() {
+                        typed.textContent = cmd.slice(0, ++i);
+                        if (i < cmd.length) typeTimer = setTimeout(step, 26);
+                    })();
+                }
 
-      var tabs = Array.prototype.slice.call(document.querySelectorAll('.pkg-tab'));
-      var commandEl = document.getElementById('install-command');
-      var copyButton = document.getElementById('copyInstall');
-      var copyStatus = document.getElementById('copyStatus');
-      var agentCopy = document.getElementById('agentCopy');
-      var copyResetTimer = null;
+                function selectTab(tab, animate) {
+                    tabs.forEach(function(t) {
+                        var on = t === tab;
+                        t.setAttribute('aria-selected', on ? 'true' : 'false');
+                        t.tabIndex = on ? 0 : -1;
+                    });
+                    if (panel) panel.setAttribute('aria-labelledby', tab.id);
+                    typeCommand(tab.getAttribute('data-cmd'), animate);
+                }
 
-      var AGENT_PROMPT =
-        'Add Materna to my project. Materna is behavioral locale parity ' +
-        'probing for Node.js and PostgreSQL. Install it with: ' +
-        'npm install materna. Docs: https://github.com/shaonkabir8/materna#readme';
+                tabs.forEach(function(tab, index) {
+                    tab.addEventListener('click', function() { selectTab(tab, true); });
+                    tab.addEventListener('keydown', function(ev) {
+                        var next = null;
+                        if (ev.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+                        else if (ev.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+                        else if (ev.key === 'Home') next = tabs[0];
+                        else if (ev.key === 'End') next = tabs[tabs.length - 1];
+                        if (next) { ev.preventDefault(); next.focus(); selectTab(next, true); }
+                    });
+                });
 
-      function renderCommand(command) {
-        commandEl.innerHTML = '';
+                typeCommand(current, true);
+            })();
 
-        var dollar = document.createElement('span');
-        dollar.className = 'dollar';
-        dollar.setAttribute('aria-hidden', 'true');
-        dollar.textContent = '$ ';
+            /* Copy install command */
+            (function() {
+                var wrap = document.getElementById('copyWrap');
+                var btn = document.getElementById('copyInstall');
+                var status = document.getElementById('copyStatus');
+                var typed = document.getElementById('typed');
+                if (!btn || !wrap) return;
 
-        /* Split at the final space so the package name keeps the
-           .cmd-pkg treatment it has in the authored markup. */
-        var splitAt = command.lastIndexOf(' ');
-        var prefix = splitAt === -1 ? command : command.slice(0, splitAt + 1);
-        var pkg = splitAt === -1 ? '' : command.slice(splitAt + 1);
+                btn.addEventListener('click', function() {
+                    var selected = document.querySelector('.pkg-tab[aria-selected="true"]');
+                    var text = selected ? selected.getAttribute('data-cmd') : (typed ? typed.textContent : '');
+                    if (!text) return;
+                    copyText(text).then(function() {
+                        wrap.classList.add('copied');
+                        if (status) status.textContent = 'Install command copied to clipboard';
+                        setTimeout(function() { wrap.classList.remove('copied'); }, 1800);
+                    }).catch(function() {
+                        if (status) status.textContent = 'Copy failed — select the command manually';
+                    });
+                });
+            })();
 
-        var dim = document.createElement('span');
-        dim.className = 'cmd-dim';
-        dim.textContent = prefix;
+            /* Copy buttons inside canvas windows */
+            Array.prototype.forEach.call(document.querySelectorAll('.canvas-copy'), function(btn) {
+                btn.addEventListener('click', function() {
+                    var target = document.getElementById(btn.getAttribute('data-copy-target'));
+                    if (!target) return;
+                    copyText(target.textContent).then(function() {
+                        btn.classList.add('copied');
+                        setTimeout(function() { btn.classList.remove('copied'); }, 1600);
+                    }).catch(function() {});
+                });
+            });
 
-        commandEl.appendChild(dollar);
-        commandEl.appendChild(dim);
+            /* Agent prompt copy */
+            (function() {
+                var btn = document.getElementById('agentCopy');
+                if (!btn) return;
+                var label = btn.querySelector('[data-agent-label]');
+                var prompt = 'Use the npm package `materna` (v0.1.0, Node >=22, zero hosted control plane, MIT). ' +
+                    'It exports probeNode(options), probePostgres(options), and compareObservations(left, right, [opts]). ' +
+                    'probeNode() is synchronous and returns a collation observation over the immutable corpus. ' +
+                    'probePostgres() is async and requires connectionString. ' +
+                    'compareObservations() returns { status, first_difference, metadata_differences } where status is ' +
+                    "'PASS', 'DIFFERENCE', or 'INCONCLUSIVE'. Exit codes: 0=PASS, 1=DIFFERENCE, 2=INCONCLUSIVE, 3=ERROR. " +
+                    'Never compare version strings to check locale parity — probe actual behavior and compare SHA-256 digests.';
 
-        if (pkg) {
-          var pkgEl = document.createElement('span');
-          pkgEl.className = 'cmd-pkg';
-          pkgEl.textContent = pkg;
-          commandEl.appendChild(pkgEl);
-        }
-      }
+                btn.addEventListener('click', function() {
+                    copyText(prompt).then(function() {
+                        var original = label.textContent;
+                        label.textContent = 'Copied to clipboard';
+                        btn.classList.add('copied');
+                        setTimeout(function() {
+                            label.textContent = original;
+                            btn.classList.remove('copied');
+                        }, 1800);
+                    }).catch(function() {});
+                });
+            })();
 
-      function flashCopyState(copied) {
-        copyButton.classList.remove('copied', 'error');
-        copyButton.classList.add(copied ? 'copied' : 'error');
+            /* Rail scroll-spy */
+            (function() {
+                var links = Array.prototype.slice.call(document.querySelectorAll('.rail-list a'));
+                if (!links.length || !('IntersectionObserver' in window)) return;
+                var byId = {};
+                links.forEach(function(a) {
+                    var id = a.getAttribute('href').slice(1);
+                    if (id) byId[id] = a;
+                });
+                var io = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (!entry.isIntersecting) return;
+                        var active = byId[entry.target.id];
+                        if (!active) return;
+                        links.forEach(function(a) { a.classList.toggle('active', a === active); });
+                    });
+                }, { rootMargin: '-72px 0px -60% 0px', threshold: 0 });
+                Object.keys(byId).forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) io.observe(el);
+                });
+            })();
 
-        copyStatus.textContent = copied
-          ? 'Install command copied to clipboard'
-          : 'Copy failed. Select the command and copy it manually.';
+            /* Command palette */
+            (function() {
+                var backdrop = document.getElementById('paletteBackdrop');
+                var input = document.getElementById('paletteInput');
+                var results = document.getElementById('paletteResults');
+                if (!backdrop || !input || !results) return;
 
-        window.clearTimeout(copyResetTimer);
-        copyResetTimer = window.setTimeout(function () {
-          copyButton.classList.remove('copied', 'error');
-          copyStatus.textContent = '';
-        }, 1600);
-      }
+                var items = [];
+                var seen = {};
+                Array.prototype.forEach.call(document.querySelectorAll('.rail-list a'), function(a) {
+                    var href = a.getAttribute('href');
+                    if (!href || seen[href]) return;
+                    seen[href] = true;
+                    var group = a.closest('.rail-group');
+                    var heading = group ? group.querySelector('h4') : null;
+                    items.push({
+                        label: a.textContent.trim(),
+                        group: heading ? heading.textContent.trim() : 'Docs',
+                        href: href
+                    });
+                });
+                if (!items.length) return;
 
-      tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-          tabs.forEach(function (other) {
-            other.setAttribute('aria-selected', String(other === tab));
-          });
-          commandEl.setAttribute('aria-labelledby', tab.id);
-          renderCommand(tab.getAttribute('data-cmd'));
-        });
-      });
+                var current = [];
+                var selected = 0;
 
-      copyButton.addEventListener('click', function () {
-        var active = tabs.filter(function (tab) {
-          return tab.getAttribute('aria-selected') === 'true';
-        })[0];
-        var command = active ? active.getAttribute('data-cmd') : '';
+                function makeLabel(text, q) {
+                    var frag = document.createDocumentFragment();
+                    if (!q) { frag.appendChild(document.createTextNode(text)); return frag; }
+                    var idx = text.toLowerCase().indexOf(q);
+                    if (idx === -1) { frag.appendChild(document.createTextNode(text)); return frag; }
+                    frag.appendChild(document.createTextNode(text.slice(0, idx)));
+                    var mark = document.createElement('mark');
+                    mark.textContent = text.slice(idx, idx + q.length);
+                    frag.appendChild(mark);
+                    frag.appendChild(document.createTextNode(text.slice(idx + q.length)));
+                    return frag;
+                }
 
-        if (!command) { return; }
+                function render(query) {
+                    var q = query.trim().toLowerCase();
+                    current = items.filter(function(it) {
+                        return !q || (it.label + ' ' + it.group).toLowerCase().indexOf(q) !== -1;
+                    });
+                    selected = 0;
+                    results.textContent = '';
+                    if (!current.length) {
+                        var empty = document.createElement('li');
+                        empty.className = 'palette-empty';
+                        empty.textContent = 'No matches for “' + query.trim() + '”';
+                        results.appendChild(empty);
+                        return;
+                    }
+                    current.forEach(function(it, i) {
+                        var li = document.createElement('li');
+                        li.setAttribute('role', 'option');
+                        if (i === 0) li.setAttribute('aria-selected', 'true');
+                        var labelSpan = document.createElement('span');
+                        labelSpan.appendChild(makeLabel(it.label, q));
+                        li.appendChild(labelSpan);
+                        var hintSpan = document.createElement('span');
+                        hintSpan.textContent = it.group;
+                        hintSpan.style.marginLeft = 'auto';
+                        hintSpan.style.fontSize = '11px';
+                        hintSpan.style.color = 'var(--fg-subtle)';
+                        li.appendChild(hintSpan);
+                        li.addEventListener('click', function() { go(it.href); });
+                        li.addEventListener('mousemove', function() {
+                            if (selected !== i) { selected = i; paint(); }
+                        });
+                        results.appendChild(li);
+                    });
+                    paint();
+                }
 
-        copyText(command).then(flashCopyState);
-      });
+                function paint() {
+                    Array.prototype.forEach.call(results.children, function(li, i) {
+                        if (li.getAttribute('role') !== 'option') return;
+                        if (i === selected) li.setAttribute('aria-selected', 'true');
+                        else li.removeAttribute('aria-selected');
+                    });
+                }
 
-      var agentLabel = agentCopy.querySelector('[data-agent-label]');
+                function go(href) {
+                    close();
+                    var target = document.getElementById(href.slice(1));
+                    if (target) {
+                        target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+                        history.replaceState(null, '', href);
+                    }
+                }
 
-      agentCopy.addEventListener('click', function () {
-        copyText(AGENT_PROMPT).then(function (copied) {
-          agentLabel.textContent = copied ? 'Copied' : 'Copy failed';
-          window.setTimeout(function () {
-            agentLabel.textContent = 'Copy prompt for your agent';
-          }, 1600);
-        });
-      });
-    }());
-  </script>
+                function open() {
+                    backdrop.hidden = false;
+                    requestAnimationFrame(function() { backdrop.classList.add('open'); });
+                    input.value = '';
+                    render('');
+                    input.focus();
+                }
 
+                function close() {
+                    backdrop.classList.remove('open');
+                    setTimeout(function() { backdrop.hidden = true; }, 170);
+                }
+
+                input.addEventListener('input', function() { render(input.value); });
+                input.addEventListener('keydown', function(ev) {
+                    if (ev.key === 'ArrowDown') {
+                        ev.preventDefault();
+                        if (current.length) { selected = (selected + 1) % current.length; paint(); }
+                    } else if (ev.key === 'ArrowUp') {
+                        ev.preventDefault();
+                        if (current.length) { selected = (selected - 1 + current.length) % current.length; paint(); }
+                    } else if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        if (current[selected]) go(current[selected].href);
+                    } else if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        close();
+                    }
+                });
+
+                backdrop.addEventListener('mousedown', function(ev) { if (ev.target === backdrop) close(); });
+
+                document.addEventListener('keydown', function(ev) {
+                    var tag = (ev.target.tagName || '').toLowerCase();
+                    var typing = tag === 'input' || tag === 'textarea' || ev.target.isContentEditable;
+                    if ((ev.key === 'k' || ev.key === 'K') && (ev.metaKey || ev.ctrlKey)) {
+                        ev.preventDefault();
+                        backdrop.hidden ? open() : close();
+                    } else if (ev.key === '/' && !typing && backdrop.hidden) {
+                        ev.preventDefault();
+                        open();
+                    }
+                });
+            })();
+
+            /* Newsletter */
+            (function() {
+                var form = document.getElementById('nlForm');
+                if (!form) return;
+                var email = document.getElementById('nlEmail');
+                var status = document.getElementById('nlStatus');
+                var submit = document.getElementById('nlSubmit');
+                var configured = form.getAttribute('action').indexOf('BUTTONDOWN_USERNAME') === -1;
+
+                form.addEventListener('submit', function(ev) {
+                    var value = email ? email.value.trim() : '';
+                    if (!value || !email.checkValidity()) {
+                        ev.preventDefault();
+                        if (status) { status.dataset.state = 'err'; status.textContent = 'Enter a valid email address.'; }
+                        if (email) email.focus();
+                        return;
+                    }
+                    if (!configured) {
+                        ev.preventDefault();
+                        form.dataset.state = 'done';
+                        if (status) { status.dataset.state = 'ok'; status.textContent = 'Demo only — swap BUTTONDOWN_USERNAME in the form action to go live.'; }
+                        if (submit) submit.disabled = true;
+                        return;
+                    }
+                    if (status) { status.dataset.state = 'pending'; status.textContent = 'Opening Buttondown…'; }
+                });
+            })();
+
+            /* On-scroll CTA */
+            (function() {
+                var cta = document.getElementById('scrollCta');
+                var up = document.getElementById('scrollUp');
+                var down = document.getElementById('scrollDown');
+                if (!cta) return;
+
+                var threshold = 400;
+                var ticking = false;
+
+                function update() {
+                    var y = window.scrollY || window.pageYOffset;
+                    var show = y > threshold;
+                    cta.classList.toggle('visible', show);
+                    cta.setAttribute('aria-hidden', show ? 'false' : 'true');
+                    ticking = false;
+                }
+
+                window.addEventListener('scroll', function() {
+                    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+                }, { passive: true });
+
+                function scrollTo(target) {
+                    window.scrollTo({ top: target, behavior: prefersReduced ? 'auto' : 'smooth' });
+                }
+
+                if (up) up.addEventListener('click', function() { scrollTo(0); });
+                if (down) down.addEventListener('click', function() { scrollTo(document.documentElement.scrollHeight); });
+
+                update();
+            })();
+
+            /* ══════════ FAQ — animated SVG flowcharts ══════════ */
+            (function () {
+                var ESC = function (s) {
+                    return String(s).replace(/[&<>"']/g, function (m) {
+                        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+                    });
+                };
+
+                var PLUS_SVG =
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+                    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                    '<path d="M12 5v14M5 12h14"/></svg>';
+
+                var FAQS = [
+                    {
+                        q: 'What does materna actually compare?',
+                        a: 'materna never compares raw output strings. It compares <strong>SHA-256 digests</strong> of the two observations. If the digests match, the outputs are byte-identical — regardless of version numbers, locale settings, or runtime flags.',
+                        flow: {
+                            nodes: [
+                                { id: 'a', type: 'process', cx: 190, y: 20, w: 160, label: 'raw output', color: '#38bdf8' },
+                                { id: 'b', type: 'process', cx: 190, y: 90, w: 170, label: 'SHA-256 digest', color: '#a78bfa' },
+                                { id: 'c', type: 'decision', cx: 190, y: 162, w: 220, label: 'digests equal?', color: '#fbbf24' },
+                                { id: 'pass', type: 'end', cx: 100, y: 265, w: 120, label: 'PASS', color: '#34d399' },
+                                { id: 'diff', type: 'end', cx: 280, y: 265, w: 150, label: 'DIFFERENCE', color: '#fb7185' }
+                            ],
+                            edges: [
+                                { path: 'M 190 64 L 190 90', color: '#a78bfa', endX: 190, endY: 90 },
+                                { path: 'M 190 134 L 190 162', color: '#fbbf24', endX: 190, endY: 162 },
+                                { path: 'M 190 218 C 190 245, 100 245, 100 265', color: '#34d399', endX: 100, endY: 265, label: 'yes', labelX: 140, labelY: 242 },
+                                { path: 'M 190 218 C 190 245, 280 245, 280 265', color: '#fb7185', endX: 280, endY: 265, label: 'no', labelX: 240, labelY: 242 }
+                            ],
+                            sequence: [
+                                { node: 'a' }, { edge: 0 }, { node: 'b' }, { edge: 1 }, { node: 'c' },
+                                { parallel: [{ edge: 2 }, { edge: 3 }] },
+                                { parallel: [{ node: 'pass' }, { node: 'diff' }] }
+                            ]
+                        }
+                    },
+                    {
+                        q: 'Why not compare version numbers?',
+                        a: 'A matching version number proves nothing about <em>collation order</em>. Two environments on the same Node.js and PostgreSQL versions can still sort the same corpus differently — ICU data, OS locale, and build flags all matter. materna only trusts observed behavior.',
+                        flow: {
+                            nodes: [
+                                { id: 'a', type: 'process', cx: 190, y: 20, w: 200, label: 'same version\nv16 · v16', color: '#38bdf8', fontSize: 12 },
+                                { id: 'c', type: 'decision', cx: 190, y: 120, w: 200, label: 'same order?', color: '#fbbf24' },
+                                { id: 'pass', type: 'end', cx: 100, y: 225, w: 120, label: 'PASS', color: '#34d399' },
+                                { id: 'diff', type: 'end', cx: 280, y: 225, w: 150, label: 'DIFFERENCE', color: '#fb7185' }
+                            ],
+                            edges: [
+                                { path: 'M 190 74 L 190 120', color: '#fbbf24', endX: 190, endY: 120 },
+                                { path: 'M 190 176 C 190 200, 100 200, 100 225', color: '#34d399', endX: 100, endY: 225, label: 'yes', labelX: 140, labelY: 198 },
+                                { path: 'M 190 176 C 190 200, 280 200, 280 225', color: '#fb7185', endX: 280, endY: 225, label: 'no', labelX: 240, labelY: 198 }
+                            ],
+                            sequence: [
+                                { node: 'a' }, { edge: 0 }, { node: 'c' },
+                                { parallel: [{ edge: 1 }, { edge: 2 }] },
+                                { parallel: [{ node: 'pass' }, { node: 'diff' }] }
+                            ]
+                        }
+                    },
+                    {
+                        q: 'What do the exit codes mean?',
+                        a: 'Strict exit codes make materna safe to gate CI on. <code>0</code> is PASS, <code>1</code> is DIFFERENCE, <code>2</code> is INCONCLUSIVE, and <code>3</code> is an ERROR. The code is the verdict.',
+                        flow: {
+                            nodes: [
+                                { id: 'a', type: 'process', cx: 180, y: 20, w: 120, label: 'compare', color: '#38bdf8' },
+                                { id: 'c1', type: 'decision', cx: 180, y: 100, w: 180, label: 'missing?', color: '#fbbf24' },
+                                { id: 'inc', type: 'end', cx: 75, y: 200, w: 115, label: 'exit 2 · INC', color: '#fbbf24', fontSize: 10.5 },
+                                { id: 'c2', type: 'decision', cx: 235, y: 200, w: 160, label: 'equal?', color: '#fbbf24' },
+                                { id: 'pass', type: 'end', cx: 155, y: 340, w: 115, label: 'exit 0 · PASS', color: '#34d399', fontSize: 10.5 },
+                                { id: 'diff', type: 'end', cx: 315, y: 340, w: 115, label: 'exit 1 · DIFF', color: '#fb7185', fontSize: 10.5 }
+                            ],
+                            edges: [
+                                { path: 'M 180 64 L 180 100', color: '#fbbf24', endX: 180, endY: 100 },
+                                { path: 'M 180 156 C 180 180, 75 180, 75 200', color: '#fbbf24', endX: 75, endY: 200, label: 'yes', labelX: 127, labelY: 172 },
+                                { path: 'M 180 156 C 180 180, 235 180, 235 200', color: '#fbbf24', endX: 235, endY: 200, label: 'no', labelX: 210, labelY: 172 },
+                                { path: 'M 235 256 C 235 290, 155 290, 155 340', color: '#34d399', endX: 155, endY: 340, label: 'yes', labelX: 195, labelY: 288 },
+                                { path: 'M 235 256 C 235 290, 315 290, 315 340', color: '#fb7185', endX: 315, endY: 340, label: 'no', labelX: 275, labelY: 288 }
+                            ],
+                            sequence: [
+                                { node: 'a' }, { edge: 0 }, { node: 'c1' },
+                                { parallel: [{ edge: 1 }, { edge: 2 }] },
+                                { parallel: [{ node: 'inc' }, { node: 'c2' }] },
+                                { parallel: [{ edge: 3 }, { edge: 4 }] },
+                                { parallel: [{ node: 'pass' }, { node: 'diff' }] }
+                            ]
+                        }
+                    },
+                    {
+                        q: 'When is a result INCONCLUSIVE?',
+                        a: 'When <strong>either</strong> observation is <code>null</code> or missing, the comparison aborts safely. Nothing is proven either way — this is not a failure, it is the absence of evidence. materna exits <code>2</code>.',
+                        flow: {
+                            nodes: [
+                                { id: 'a', type: 'process', cx: 110, y: 20, w: 140, label: 'node obs', color: '#34d399' },
+                                { id: 'b', type: 'process', cx: 270, y: 20, w: 140, label: 'pg obs', color: '#a78bfa' },
+                                { id: 'c', type: 'decision', cx: 190, y: 110, w: 200, label: 'both present?', color: '#fbbf24' },
+                                { id: 'inc', type: 'end', cx: 90, y: 215, w: 140, label: 'INCONCLUSIVE', color: '#fbbf24', fontSize: 11 },
+                                { id: 'cmp', type: 'end', cx: 290, y: 215, w: 140, label: 'compare hashes', color: '#38bdf8', fontSize: 11 }
+                            ],
+                            edges: [
+                                { path: 'M 110 64 C 110 88, 190 85, 190 110', color: '#fbbf24', endX: 190, endY: 110 },
+                                { path: 'M 270 64 C 270 88, 190 85, 190 110', color: '#fbbf24', endX: 190, endY: 110 },
+                                { path: 'M 190 166 C 190 190, 90 190, 90 215', color: '#fbbf24', endX: 90, endY: 215, label: 'no', labelX: 140, labelY: 190 },
+                                { path: 'M 190 166 C 190 190, 290 190, 290 215', color: '#34d399', endX: 290, endY: 215, label: 'yes', labelX: 240, labelY: 190 }
+                            ],
+                            sequence: [
+                                { parallel: [{ node: 'a' }, { node: 'b' }] },
+                                { parallel: [{ edge: 0 }, { edge: 1 }] },
+                                { node: 'c' },
+                                { parallel: [{ edge: 2 }, { edge: 3 }] },
+                                { parallel: [{ node: 'inc' }, { node: 'cmp' }] }
+                            ]
+                        }
+                    },
+                    {
+                        q: 'Can I archive the comparison for later?',
+                        a: 'Yes. <code>materna report.html</code> emits a <strong>deterministic static HTML artifact</strong> with no JavaScript inside. It is safe to diff, archive, and attach to a release. The same inputs always produce the same file.',
+                        flow: {
+                            nodes: [
+                                { id: 'a', type: 'process', cx: 180, y: 20, w: 140, label: 'compare', color: '#38bdf8' },
+                                { id: 'b', type: 'process', cx: 180, y: 100, w: 170, label: 'report.html', color: '#a78bfa' },
+                                { id: 'c', type: 'process', cx: 180, y: 180, w: 190, label: 'no JavaScript inside', color: '#94a3b8', fontSize: 11 },
+                                { id: 'd', type: 'end', cx: 180, y: 270, w: 190, label: 'diff · archive · attach', color: '#34d399', fontSize: 11 }
+                            ],
+                            edges: [
+                                { path: 'M 180 64 L 180 100', color: '#a78bfa', endX: 180, endY: 100 },
+                                { path: 'M 180 144 L 180 180', color: '#94a3b8', endX: 180, endY: 180 },
+                                { path: 'M 180 224 L 180 270', color: '#34d399', endX: 180, endY: 270 }
+                            ],
+                            sequence: [
+                                { node: 'a' }, { edge: 0 }, { node: 'b' }, { edge: 1 },
+                                { node: 'c' }, { edge: 2 }, { node: 'd' }
+                            ]
+                        }
+                    }
+                ];
+
+                function buildFlowSvg(cfg) {
+                    var PAD = 16;
+                    var DEFAULT_H = { process: 44, decision: 56, end: 52 };
+
+                    cfg.nodes.forEach(function (n) {
+                        n.h = n.h || DEFAULT_H[n.type] || 44;
+                        n.x = n.cx - n.w / 2;
+                    });
+
+                    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                    cfg.nodes.forEach(function (n) {
+                        minX = Math.min(minX, n.x);
+                        maxX = Math.max(maxX, n.x + n.w);
+                        minY = Math.min(minY, n.y);
+                        maxY = Math.max(maxY, n.y + n.h);
+                    });
+                    var vx = minX - PAD, vy = minY - PAD;
+                    var vw = (maxX - minX) + PAD * 2;
+                    var vh = (maxY - minY) + PAD * 2;
+
+                    var edgesSvg = '';
+                    cfg.edges.forEach(function (e, i) {
+                        var color = e.color || '#64748b';
+                        edgesSvg += '<g class="flow-edge" data-i="' + i + '">';
+                        edgesSvg += '<path class="edge-line" d="' + e.path + '" fill="none" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
+                        edgesSvg += '<circle class="edge-end" cx="' + e.endX + '" cy="' + e.endY + '" r="3.2" fill="' + color + '" opacity="0"/>';
+                        if (e.label) {
+                            edgesSvg += '<text class="edge-label" x="' + e.labelX + '" y="' + e.labelY + '" text-anchor="middle" ' +
+                                'font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="' + color + '" ' +
+                                'stroke="#0a0a0a" stroke-width="3.5" stroke-linejoin="round" style="paint-order:stroke">' + ESC(e.label) + '</text>';
+                        }
+                        edgesSvg += '</g>';
+                    });
+
+                    var nodesSvg = '';
+                    cfg.nodes.forEach(function (n) {
+                        var isDecision = n.type === 'decision';
+                        var isEnd = n.type === 'end';
+                        var r = isEnd ? 6 : 10;
+
+                        nodesSvg += '<g class="flow-node" data-id="' + n.id + '">';
+
+                        if (isDecision) {
+                            var pts = [
+                                (n.x + n.w * 0.15) + ',' + n.y,
+                                (n.x + n.w * 0.85) + ',' + n.y,
+                                (n.x + n.w) + ',' + (n.y + n.h / 2),
+                                (n.x + n.w * 0.85) + ',' + (n.y + n.h),
+                                (n.x + n.w * 0.15) + ',' + (n.y + n.h),
+                                n.x + ',' + (n.y + n.h / 2)
+                            ].join(' ');
+                            nodesSvg += '<polygon class="node-ring" points="' + pts + '" fill="none" stroke="' + n.color + '" stroke-width="1.5" opacity="0"/>';
+                            nodesSvg += '<polygon class="node-box" points="' + pts + '" fill="#0f172a" stroke="' + n.color + '" stroke-width="1.8" stroke-linejoin="round"/>';
+                        } else {
+                            nodesSvg += '<rect class="node-ring" x="' + (n.x - 4) + '" y="' + (n.y - 4) + '" width="' + (n.w + 8) + '" height="' + (n.h + 8) + '" rx="' + (r + 3) + '" fill="none" stroke="' + n.color + '" stroke-width="1.5" opacity="0"/>';
+                            nodesSvg += '<rect class="node-box" x="' + n.x + '" y="' + n.y + '" width="' + n.w + '" height="' + n.h + '" rx="' + r + '" fill="#0f172a" stroke="' + n.color + '" stroke-width="1.8"/>';
+                            if (isEnd) {
+                                nodesSvg += '<rect x="' + (n.x + 4) + '" y="' + (n.y + 4) + '" width="' + (n.w - 8) + '" height="' + (n.h - 8) + '" rx="' + Math.max(2, r - 2) + '" fill="none" stroke="' + n.color + '" stroke-width="0.8" opacity="0.4"/>';
+                            }
+                        }
+
+                        var fs = n.fontSize || 12.5;
+                        var lines = String(n.label).split('\n');
+                        var cy = n.y + n.h / 2;
+                        if (lines.length === 1) {
+                            nodesSvg += '<text x="' + (n.x + n.w / 2) + '" y="' + cy + '" text-anchor="middle" dominant-baseline="central" font-family="ui-monospace, monospace" font-size="' + fs + '" font-weight="500" fill="#e2e8f0">' + ESC(lines[0]) + '</text>';
+                        } else {
+                            var step = fs + 2;
+                            lines.forEach(function (line, li) {
+                                var yOff = (li - (lines.length - 1) / 2) * step;
+                                nodesSvg += '<text x="' + (n.x + n.w / 2) + '" y="' + (cy + yOff) + '" text-anchor="middle" dominant-baseline="central" font-family="ui-monospace, monospace" font-size="' + fs + '" font-weight="500" fill="#e2e8f0">' + ESC(line) + '</text>';
+                            });
+                        }
+
+                        nodesSvg += '</g>';
+                    });
+
+                    return '<svg class="flow-svg" viewBox="' + vx + ' ' + vy + ' ' + vw + ' ' + vh + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">' +
+                        edgesSvg + nodesSvg + '</svg>';
+                }
+
+                var NODE_MS = 320;
+                var EDGE_MS = 500;
+
+                function animateFlow(wrapper, sequence) {
+                    if (wrapper._timers) wrapper._timers.forEach(clearTimeout);
+                    wrapper._timers = [];
+                    var setT = function (fn, ms) {
+                        var id = setTimeout(fn, ms);
+                        wrapper._timers.push(id);
+                    };
+
+                    var svg = wrapper.querySelector('.flow-svg');
+                    if (!svg) return;
+
+                    var nodes = svg.querySelectorAll('.flow-node');
+                    var edges = svg.querySelectorAll('.flow-edge');
+                    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                    nodes.forEach(function (n) {
+                        n.classList.remove('landed');
+                        n.style.transition = 'none';
+                        n.style.opacity = '0';
+                        n.style.transform = 'scale(0.8)';
+                    });
+                    edges.forEach(function (e) {
+                        var p = e.querySelector('.edge-line');
+                        var dot = e.querySelector('.edge-end');
+                        var len = p.getTotalLength();
+                        p.style.transition = 'none';
+                        p.style.strokeDasharray = len;
+                        p.style.strokeDashoffset = len;
+                        if (dot) {
+                            dot.style.transition = 'none';
+                            dot.style.opacity = '0';
+                        }
+                    });
+
+                    void svg.getBoundingClientRect();
+
+                    if (reduce) {
+                        nodes.forEach(function (n) { n.style.opacity = '1'; n.style.transform = 'none'; });
+                        edges.forEach(function (e) {
+                            e.querySelector('.edge-line').style.strokeDashoffset = '0';
+                            var d = e.querySelector('.edge-end');
+                            if (d) d.style.opacity = '1';
+                        });
+                        return;
+                    }
+
+                    var runNode = function (id, at) {
+                        var node = svg.querySelector('.flow-node[data-id="' + id + '"]');
+                        if (!node) return;
+                        setT(function () {
+                            node.style.transition = 'opacity 260ms ease, transform 480ms cubic-bezier(.34,1.56,.64,1)';
+                            node.style.opacity = '1';
+                            node.style.transform = 'scale(1)';
+                            node.classList.add('landed');
+                            setT(function () { node.classList.remove('landed'); }, 900);
+                        }, at);
+                    };
+
+                    var runEdge = function (idx, at) {
+                        var edge = svg.querySelector('.flow-edge[data-i="' + idx + '"]');
+                        if (!edge) return;
+                        var p = edge.querySelector('.edge-line');
+                        var dot = edge.querySelector('.edge-end');
+
+                        setT(function () {
+                            p.style.transition = 'stroke-dashoffset ' + EDGE_MS + 'ms cubic-bezier(.4,0,.2,1)';
+                            p.style.strokeDashoffset = '0';
+                        }, at);
+
+                        if (dot) {
+                            setT(function () {
+                                dot.style.transition = 'opacity 160ms ease';
+                                dot.style.opacity = '1';
+                            }, at + EDGE_MS - 80);
+                            setT(function () {
+                                dot.style.transition = 'opacity 320ms ease';
+                                dot.style.opacity = '0';
+                            }, at + EDGE_MS + 200);
+                        }
+                    };
+
+                    var t = 100;
+                    sequence.forEach(function (step) {
+                        if (step.node) {
+                            runNode(step.node, t);
+                            t += NODE_MS;
+                        } else if (step.edge !== undefined) {
+                            runEdge(step.edge, t);
+                            t += EDGE_MS;
+                        } else if (step.parallel) {
+                            var maxDur = 0;
+                            step.parallel.forEach(function (sub) {
+                                if (sub.node) {
+                                    runNode(sub.node, t);
+                                    maxDur = Math.max(maxDur, NODE_MS);
+                                } else if (sub.edge !== undefined) {
+                                    runEdge(sub.edge, t);
+                                    maxDur = Math.max(maxDur, EDGE_MS);
+                                }
+                            });
+                            t += maxDur;
+                        }
+                    });
+                }
+
+                var list = document.getElementById('faq-list');
+                if (!list) return;
+
+                FAQS.forEach(function (faq) {
+                    var item = document.createElement('div');
+                    item.className = 'faq-item';
+
+                    var btn = document.createElement('button');
+                    btn.className = 'faq-q';
+                    btn.type = 'button';
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.innerHTML = '<span>' + faq.q + '</span>' + PLUS_SVG;
+
+                    var ans = document.createElement('div');
+                    ans.className = 'faq-a';
+                    ans.hidden = true;
+
+                    var inner = '<p>' + faq.a + '</p>';
+                    if (faq.flow) {
+                        inner += '<div class="flow-wrap">' + buildFlowSvg(faq.flow) + '</div>';
+                        inner += '<button class="flow-replay" type="button">↻ Replay diagram</button>';
+                    }
+                    ans.innerHTML = inner;
+
+                    btn.addEventListener('click', function () {
+                        var open = item.classList.toggle('open');
+                        btn.setAttribute('aria-expanded', open);
+                        ans.hidden = !open;
+                        if (open && faq.flow) {
+                            requestAnimationFrame(function () {
+                                void ans.offsetHeight;
+                                animateFlow(ans.querySelector('.flow-wrap'), faq.flow.sequence);
+                            });
+                        }
+                    });
+
+                    var replay = ans.querySelector('.flow-replay');
+                    if (replay) {
+                        replay.addEventListener('click', function () {
+                            animateFlow(ans.querySelector('.flow-wrap'), faq.flow.sequence);
+                        });
+                    }
+
+                    item.appendChild(btn);
+                    item.appendChild(ans);
+                    list.appendChild(item);
+                });
+            })();
+
+        })();
+    </script>
 </body>
-</html>
+
+  </html>
